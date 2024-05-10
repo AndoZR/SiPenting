@@ -9,29 +9,26 @@ use Illuminate\Support\Facades\Auth;
 class authController extends Controller
 {
     public function index() {
-        $data = User::get();
-        dd($data);
         return 'selamat';
     }
-    public function coba(Request $request) {
-        var_dump($_POST);
-        $data = User::get();
+    public function coba() {
         return 'selamat';
     }
 
     public function signIn(Request $request) {
-        if(strpos($request->username, 'admin') !== false){
-            if(Auth::attempt($request->only('username', 'password'))) {
-                return 'berhasil';
-            }
-        } else {
-            if(Auth::attempt($request->only('username', 'password'))) {
-                return 'berhasil';
-            }
+        if (Auth::attempt($request->only('username', 'password'))) {
+            $user = Auth::user();
+            // $token = $user->createToken('token')->accessToken;
+            $token = $request->header('Authorization');
+            return $user;
+            // return $token;
+            // return response()->json(['token' => $token], 200);
+
         }
-        return redirect('/')->with('message', 'Username Atau Password Salah!');
+
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
-    
+
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
