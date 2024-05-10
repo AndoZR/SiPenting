@@ -9,25 +9,19 @@ use Illuminate\Support\Facades\Auth;
 class authController extends Controller
 {
     public function index() {
-        return 'selamat';
-    }
-    public function coba() {
-        return 'selamat';
+        return 'index';
     }
 
     public function signIn(Request $request) {
         if (Auth::attempt($request->only('username', 'password'))) {
             $user = Auth::user();
-            // $token = $user->createToken('token')->accessToken;
-            $token = $request->header('Authorization');
-            return $user;
-            // return $token;
-            // return response()->json(['token' => $token], 200);
-
+            $token = $user->createToken('api_token')->plainTextToken;
+            $token_id = $user->tokens->last()->id;
+            return response()->json(['token' => $token, 'token_id' => $token_id], 200);
         }
-
         return response()->json(['error' => 'Unauthorized'], 401);
     }
+    
 
     public function logout(Request $request)
     {
