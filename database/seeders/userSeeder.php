@@ -17,12 +17,12 @@ class userSeeder extends Seeder
     {
         $faker = Faker::create();
         $nowDate = date('Y-m-d');
-        for($i = 0; $i <= 10; $i++) {
+        for($i = 0; $i <= 3; $i++) {
             DB::table('users')->insert([
                 [
-                    'username' => 'user'.$i,
+                    'nik' => 350920090402000 + $i,
+                    'username' => 350920090402000 + $i,
                     'password' => hash::make('123123123'),
-                    'email' => 'andozroyan850@gmail.com' . $i,
                     'created_at' => $nowDate,
                 ],
             ]);
