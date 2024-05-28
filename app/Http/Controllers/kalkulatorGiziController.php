@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class kalkulatorGiziController extends Controller
 {
     public function getMakanan() {
-        $dataMakanan = makanan::get();
+        $dataMakanan = makanan::with('jenis_gizi')->get();
         return ResponseFormatter::success($dataMakanan, 'Data Makanan Berhasil Terkirim');
     }
 

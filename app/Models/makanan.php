@@ -15,4 +15,9 @@ class makanan extends Model
         'nama',
         'id_jenis_gizi',
     ];
+
+    public function jenis_gizi()
+    {
+        return $this->belongsTo(jenis_gizi::class, 'id_jenis_gizi', 'id');
+    }
 }
