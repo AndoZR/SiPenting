@@ -23,6 +23,16 @@ class AuthController extends Controller
     public function login()
     {
         $credentials = request(['username', 'password']);
+        $username = $credentials['username'];
+        
+        // Check if the username exists in the database
+        $userExists = User::where('username', $username)->exists();
+    
+        if (!$userExists) {
+            return response()->json(['error' => 'Pengguna Tidak Ditemukan, Pastikan Username Anda Benar!'], 404);
+        }
+
+        // $credentials = request(['username', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -84,6 +94,8 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:255|unique:users,username,nik',
             'password' => 'required|string|max:255',
+            'tanggalLahir' => 'required|date',
+            'namaIbu' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -94,7 +106,10 @@ class AuthController extends Controller
             $dataUser = User::create([
                 'username' => $request->username,
                 'nik' => $request->username,
+                'tanggalLahir' => $request->tanggalLahir,
+                'namaIbu' => $request->namaIbu,
                 'password' => Hash::make($request->password),
+                'role' => 1,
             ]);
 
             return ResponseFormatter::success($dataUser, "Data User Berhasil Dibuat!");
@@ -102,5 +117,11 @@ class AuthController extends Controller
             Log::error($e->getMessage());
             return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
         }
+    }
+
+    public function getUser()
+    {
+        $user = Auth::user()->makeHidden('password');
+        return ResponseFormatter::success($user, "Data User Berhasil Didapat!");
     }
 }

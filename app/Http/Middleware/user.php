@@ -14,12 +14,12 @@ class user
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$role): Response
     {
-        if(Auth::check()){
-
+        if ($request->user() && in_array($request->user()->role, $role)) {
             return $next($request);
         }
-        return response('Unauthorized', 401);
+
+        return response()->json(['message' => 'Anda tidak memiliki akses!'], 403);
     }
 }
