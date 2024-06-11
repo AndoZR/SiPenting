@@ -15,56 +15,38 @@ class makanan extends Seeder
     {
         DB::table('makanan')->insert([
             [
-                'nama' => 'Nasi',
-                'id_jenis_gizi' => 1,
+                'nama' => 'Bubur Komplit',
+                'gambar' => 'buburKomplit.jpg',
             ],
         ]);
         DB::table('makanan')->insert([
             [
-                'nama' => 'Roti',
-                'id_jenis_gizi' => 1,
+                'nama' => 'Air Mineral',
+                'gambar' => 'air.jpg',
             ],
         ]);
         DB::table('makanan')->insert([
             [
-                'nama' => 'Ikan',
-                'id_jenis_gizi' => 2,
+                'nama' => 'Lauk Pauk',
+                'gambar' => 'lauk.jpg',
             ],
         ]);
         DB::table('makanan')->insert([
             [
-                'nama' => 'Ayam',
-                'id_jenis_gizi' => 2,
+                'nama' => 'nasi',
+                'gambar' => 'nasi.jpg',
             ],
         ]);
         DB::table('makanan')->insert([
             [
-                'nama' => 'Sayur Bayam',
-                'id_jenis_gizi' => 3,
+                'nama' => 'Sayur-Sayuran',
+                'gambar' => 'sayur.jpeg',
             ],
         ]);
         DB::table('makanan')->insert([
             [
-                'nama' => 'Sayur Sop',
-                'id_jenis_gizi' => 3,
-            ],
-        ]);
-        DB::table('makanan')->insert([
-            [
-                'nama' => 'Apel',
-                'id_jenis_gizi' => 4,
-            ],
-        ]);
-        DB::table('makanan')->insert([
-            [
-                'nama' => 'Pisang',
-                'id_jenis_gizi' => 4,
-            ],
-        ]);
-        DB::table('makanan')->insert([
-            [
-                'nama' => 'Air Putih',
-                'id_jenis_gizi' => 5,
+                'nama' => 'Buah-Buahan',
+                'gambar' => 'buah.jpg',
             ],
         ]);
     }

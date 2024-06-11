@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('makanan', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->unsignedBigInteger('id_jenis_gizi');
-            $table->foreign('id_jenis_gizi')->references('id')->on('jenis_gizi')->onDelete('cascade');
+            $table->text('gambar');
+            // $table->unsignedBigInteger('id_jenis_gizi');
+            // $table->foreign('id_jenis_gizi')->references('id')->on('jenis_gizi')->onDelete('cascade');
         });
     }
 

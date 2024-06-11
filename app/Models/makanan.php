@@ -13,11 +13,7 @@ class makanan extends Model
 
     protected $fillable = [
         'nama',
-        'id_jenis_gizi',
+        'gambar',
+        // 'id_jenis_gizi',
     ];
-
-    public function jenis_gizi()
-    {
-        return $this->belongsTo(jenis_gizi::class, 'id_jenis_gizi', 'id');
-    }
 }
