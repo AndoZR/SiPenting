@@ -24,7 +24,7 @@ class userSeeder extends Seeder
                     'username' => 350920090402000 + $i,
                     'tanggalLahir' => now(),
                     'namaIbu' => "User" . $i,
-                    'umurBayi' => 11,
+                    'tanggalLahirBayi' => "2023-05-01",
                     'role' => 1,
                     'password' => hash::make('123123123'),
                     'created_at' => $nowDate,

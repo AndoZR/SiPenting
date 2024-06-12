@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('username');
             $table->string('namaIbu');
             $table->date('tanggalLahir');
-            $table->integer('umurBayi'); // dalam Bulan
+            $table->date('tanggalLahirBayi')->nullable();
             $table->text('profilImg')->nullable();
             // $table->string('email')->unique();
             // $table->timestamp('email_verified_at')->nullable();

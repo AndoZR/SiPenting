@@ -22,7 +22,7 @@ class kalkulatorGiziController extends Controller
         $collectSdm = [];
         
         // Mencari selisih bulan(Umur Bayi)
-        $umurBayi = round(Carbon::parse(Auth::user()->tanggalLahir)->diffInMonths(now()));
+        $umurBayi = round(Carbon::parse(Auth::user()->tanggalLahirBayi)->diffInMonths(now()));
 
         foreach($dataMakanan as $item){
             $collectMakanan[] = $item[0];
