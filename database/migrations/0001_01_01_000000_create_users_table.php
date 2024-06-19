@@ -19,6 +19,8 @@ return new class extends Migration
             $table->date('tanggalLahir');
             $table->date('tanggalLahirBayi')->nullable();
             $table->text('profilImg')->nullable();
+            $table->decimal('bbPraHamil')->nullable();
+            $table->decimal('tinggiBadan')->nullable();
             // $table->string('email')->unique();
             // $table->timestamp('email_verified_at')->nullable();
             $table->integer('role');

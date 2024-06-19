@@ -124,4 +124,8 @@ class AuthController extends Controller
         $user = Auth::user()->makeHidden('password');
         return ResponseFormatter::success($user, "Data User Berhasil Didapat!");
     }
+
+    public function editProfil() {
+        return True;
+    }
 }

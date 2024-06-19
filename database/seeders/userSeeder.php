@@ -22,9 +22,11 @@ class userSeeder extends Seeder
                 [
                     'nik' => 350920090402000 + $i,
                     'username' => 350920090402000 + $i,
-                    'tanggalLahir' => now(),
+                    'tanggalLahir' => "1995-01-01",
                     'namaIbu' => "User" . $i,
                     'tanggalLahirBayi' => "2023-05-01",
+                    'bbPraHamil' => 50.5,
+                    'tinggiBadan' => 160,
                     'role' => 1,
                     'password' => hash::make('123123123'),
                     'created_at' => $nowDate,

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\kalkulatorGiziController;
+use App\Http\Controllers\kalkulatorStuntingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\menuController;
@@ -16,6 +17,11 @@ Route::middleware(['auth:api', 'user:1'])->group(function () {
     Route::group(['prefix'=>'kalkulatorGizi'], function () {
         Route::get('/', [kalkulatorGiziController::class, 'getMakanan'])->name('getMakanan');
         Route::post('/cekGizi', [kalkulatorGiziController::class, 'cekGizi'])->name('cekGizi');
+    });
+
+    Route::group(['prefix'=>'kalkulatorStunting'], function () {
+        Route::post('/cekStuntingIbu', [kalkulatorStuntingController::class, 'cekStuntingIbu'])->name('cekStuntingIbu');
+        Route::post('/cekStuntingAnak', [kalkulatorStuntingController::class, 'cekStuntingAnak'])->name('cekStuntingAnak');
     });
 
 });
