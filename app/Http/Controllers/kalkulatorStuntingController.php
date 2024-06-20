@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\beratBadan;
-use Illuminate\Http\Request;
+use Exception;
 use Carbon\Carbon;
+use App\Models\berat_badan;
+use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
-use App\Models\anak;
-use App\Models\dataStunt;
+use App\Models\bayi;
+use App\Models\data_stunt;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class kalkulatorStuntingController extends Controller
@@ -21,12 +23,17 @@ class kalkulatorStuntingController extends Controller
 
         // Menyimpan bb saat ini
         $user_id = Auth::user()->id;
-
+        
         // Menyimpan berat badan saat ini ke database
-        beratBadan::create([
-            'bbNow' => $bbNow,
-            'id_users' => $user_id
-        ]);
+        try {
+            $berat = berat_badan::create([
+                'bbNow' => $bbNow,
+                'id_users' => $user_id
+            ]);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+        }
 
         // Define the threshold values
         $lilaThreshold = 23.5;
@@ -75,11 +82,11 @@ class kalkulatorStuntingController extends Controller
 
     public function cekStuntingAnak(Request $request){
         $idUser = Auth::user()->id;
-        $anak = anak::where('id', $idUser)->first();
+        $anak = bayi::where('id', $idUser)->first();
         $umur = round(Carbon::parse($anak->tanggalLahir)->diffInMonths(now()));        
         $tinggiBadan = $request->tinggiBadan;
 
-        $heightStandard = dataStunt::where('Umur (bulan)', (int)$umur)->first();
+        $heightStandard = data_stunt::where('Umur (bulan)', (int)$umur)->first();
         // Menghapus kolom "id" dan "kelamin" dari array $heightStandard
         unset($heightStandard['id']);
         unset($heightStandard['kelamin']);

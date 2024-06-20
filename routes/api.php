@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\bayiController;
 use App\Http\Controllers\kalkulatorGiziController;
 use App\Http\Controllers\kalkulatorStuntingController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\menuController;
 
@@ -22,6 +22,13 @@ Route::middleware(['auth:api', 'user:1'])->group(function () {
     Route::group(['prefix'=>'kalkulatorStunting'], function () {
         Route::post('/cekStuntingIbu', [kalkulatorStuntingController::class, 'cekStuntingIbu'])->name('cekStuntingIbu');
         Route::post('/cekStuntingAnak', [kalkulatorStuntingController::class, 'cekStuntingAnak'])->name('cekStuntingAnak');
+    });
+
+    Route::group(['prefix'=>'bayi'], function () {
+        Route::get('/', [bayiController::class, 'index'])->name('index');
+        Route::post('/storeBayi', [bayiController::class, 'storeBayi'])->name('storeBayi');
+        Route::post('/updateBayi', [bayiController::class, 'updateBayi'])->name('updateBayi');
+        Route::post('/deleteBayi', [bayiController::class, 'deleteBayi'])->name('deleteBayi');
     });
 
 });

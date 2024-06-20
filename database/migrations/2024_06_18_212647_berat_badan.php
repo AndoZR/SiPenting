@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('anak', function (Blueprint $table) {
+        Schema::create('berat_badan', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->date('tanggalLahir');
-            $table->string('kelamin');
+            $table->decimal('bbNow')->nullable();
             $table->unsignedBigInteger('id_users');
             $table->foreign('id_users')->references('id')->on('users')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('beratBadan');
     }
 };

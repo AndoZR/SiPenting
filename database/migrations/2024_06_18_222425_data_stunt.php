@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dataStunt', function (Blueprint $table) {
+        Schema::create('data_stunt', function (Blueprint $table) {
             $table->id();
             $table->integer('Umur (bulan)');
             $table->decimal('Panjang Badan (cm) -3 SD');

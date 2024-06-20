@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Faker\Factory as Faker;
 
-class anak extends Seeder
+class bayi extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class anak extends Seeder
     {
         $nowDate = date('Y-m-d');
         for($i = 0; $i <= 3; $i++) {
-            DB::table('anak')->insert([
+            DB::table('bayi')->insert([
                 [
                     'nama' => 'Wiliam',
                     'tanggalLahir' => "2024-01-01",
