@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             userSeeder::class,
             makanan::class,
-            anak::class,
+            bayi::class,
+            dataStunt::class,
         ]);
     }
 }

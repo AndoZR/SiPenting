@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\bayi;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
@@ -14,11 +15,27 @@ use Illuminate\Support\Facades\Validator;
 class bayiController extends Controller
 {
     public function index(){
-
-
         try {
             $id = Auth::user()->id;
-            $dataBayi = bayi::where("id",$id)->get();
+            $dataBayi = bayi::where("id_users",$id)->get();
+
+            foreach($dataBayi as $bayi){
+                $tanggalLahir = Carbon::parse($bayi->tanggalLahir);
+
+                // Mendapatkan tanggal saat ini
+                $tanggalSekarang = Carbon::now();
+                
+                // Menghitung perbedaan tahun, bulan, dan hari
+                $diff = $tanggalSekarang->diff($tanggalLahir);
+                
+                $year = $diff->y;
+                $month = $diff->m;
+                $day = $diff->d;
+                
+                $umurArray = [$year, $month, $day];
+                $bayi->umur = $umurArray;
+            }
+
             return ResponseFormatter::success($dataBayi,'Data Bayi Berhasil Didapat!');
         } catch (Exception $e) {
             Log::error($e->getMessage());

@@ -53,6 +53,9 @@ class kalkulatorStuntingController extends Controller
         }
 
         // cek bb
+        if(!isset($bbPraHamil) || $bbPraHamil == 0 || !isset($tinggiBadan) || $tinggiBadan == 0){
+            return ResponseFormatter::error($bbPraHamil,'Data Berat Badan Pra Hamil / Tinggi Badan tidak boleh kosong, Silahkan lengkapi profil!', 500);
+        }
         $IMT = $bbPraHamil / (($tinggiBadan/100)**2);
         if ($IMT < 18.5){
             $issues["IMT"][] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 12.5 - 18 Kg";
@@ -81,8 +84,9 @@ class kalkulatorStuntingController extends Controller
     }
 
     public function cekStuntingAnak(Request $request){
-        $idUser = Auth::user()->id;
-        $anak = bayi::where('id', $idUser)->first();
+        // $idUser = Auth::user()->id;
+        $idBayi = $request->idBayi;
+        $anak = bayi::where('id', $idBayi)->first();
         $umur = round(Carbon::parse($anak->tanggalLahir)->diffInMonths(now()));        
         $tinggiBadan = $request->tinggiBadan;
 

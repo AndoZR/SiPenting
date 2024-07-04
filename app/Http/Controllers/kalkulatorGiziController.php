@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\makanan;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
+use App\Models\bayi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,6 +22,7 @@ class kalkulatorGiziController extends Controller
         // $dataMakanan = $request->request->all();
         $collectMakanan = [];
         $collectSdm = [];
+        $bayi = bayi::where('id',$request->idBayi)->first();
 
         // Menguraikan JSON menjadi array PHP
         $dataMakanan = json_decode($dataMakanan, true);
@@ -31,7 +33,7 @@ class kalkulatorGiziController extends Controller
         }
 
         // Mencari selisih bulan(Umur Bayi)
-        $umurBayi = round(Carbon::parse(Auth::user()->tanggalLahirBayi)->diffInMonths(now()));
+        $umurBayi = round(Carbon::parse($bayi->tanggalLahir)->diffInMonths(now()));
 
         foreach($dataMakanan as $item){
             $collectMakanan[] = $item[0];
@@ -58,6 +60,7 @@ class kalkulatorGiziController extends Controller
 
     private function cekSdm($dataMakanan,$sdm1,$sdm2,$collectMakanan){
         $hasil = [];
+
         $dbMakananExc = makanan::whereNotIn("id", $collectMakanan)->where('id', '!=', 1)->get("nama");
         foreach($dbMakananExc as $x){
             $hasil["makanExcept"][] = $x->nama . " Tidak Terpenuhi!";
@@ -65,6 +68,7 @@ class kalkulatorGiziController extends Controller
 
         $collectNamaMakanan = [];
         $dbMakananTersedia = makanan::whereIn("id", $collectMakanan)->get("nama");
+        // $dbMakananTersedia = makanan::get("nama");
         foreach($dbMakananTersedia as $y){
             $collectNamaMakanan[] = $y->nama;
         }
@@ -72,6 +76,12 @@ class kalkulatorGiziController extends Controller
         $index = 0;
         foreach($dataMakanan as $item) {
             $item[0] = $collectNamaMakanan[$index];
+
+            if ($item[1] == 0){
+                $hasil["makanExcept"][] = $item[0] . " Tidak Terpenuhi!";
+                $index++;
+                continue;
+            } // kalo ada sdm 0 return tidak terpenuhi
 
             if($item[0] == "Air Mineral"){ //exception buat air mineral, cus gak make sdm
                 $hasil["sdm"][] = "Konsumsi $item[0] cukup!";

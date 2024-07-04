@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Database\Seeders\userSeeder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -85,37 +86,64 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'role' => auth()->user()->role
         ]);
     }
 
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:255|unique:users,username,nik',
-            'password' => 'required|string|max:255',
-            'tanggalLahir' => 'required|date',
-            'namaIbu' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
-        };
-
-        try {
-            $dataUser = User::create([
-                'username' => $request->username,
-                'nik' => $request->username,
-                'tanggalLahir' => $request->tanggalLahir,
-                'namaIbu' => $request->namaIbu,
-                'password' => Hash::make($request->password),
-                'role' => 1,
+        if($request->role == 1){
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|integer|digits:16|unique:users,nik',
+                'tanggalLahir' => 'required|date',
+                'namaIbu' => 'required|string|max:255',
+                'tinggiBadan' => 'required|integer',
             ]);
-
-            return ResponseFormatter::success($dataUser, "Data User Berhasil Dibuat!");
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+     
+            if ($validator->fails()) {
+                return ResponseFormatter::error(null,$validator->errors(),422);
+            };
+    
+            try {
+                $dataUser = User::create([
+                    'username' => $request->username,
+                    'nik' => $request->username,
+                    'tanggalLahir' => $request->tanggalLahir,
+                    'namaIbu' => $request->namaIbu,
+                    'bbPraHamil' => $request->bbPraHamil,
+                    'tinggiBadan' => $request->tinggiBadan,
+                    'password' => Hash::make($request->password),
+                    'role' => 1,
+                ]);
+    
+                return ResponseFormatter::success($dataUser, "Data User Berhasil Dibuat!");
+            } catch (Exception $e) {
+                Log::error($e->getMessage());
+                return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            }
+        }else{
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|unique:users,nik',
+            ]);
+     
+            if ($validator->fails()) {
+                return ResponseFormatter::error(null,$validator->errors(),422);
+            };
+    
+            try {
+                $dataUser = User::create([
+                    'username' => $request->username,
+                    'nik' => $request->username,
+                    'password' => Hash::make($request->password),
+                    'role' => 2,
+                ]);
+    
+                return ResponseFormatter::success($dataUser, "Data User Berhasil Dibuat!");
+            } catch (Exception $e) {
+                Log::error($e->getMessage());
+                return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            }
         }
     }
 
@@ -125,7 +153,36 @@ class AuthController extends Controller
         return ResponseFormatter::success($user, "Data User Berhasil Didapat!");
     }
 
-    public function editProfil() {
-        return True;
+    public function updateProfile(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'username' => 'integer|digits:16',
+            'tanggalLahir' => 'date',
+            'namaIbu' => 'string|max:255',
+            'bbPraHamil' => 'numeric|max:1000',
+            'tinggiBadan' => 'numeric|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(null,$validator->errors(),422);
+        };
+
+        try{
+            $data = User::find(Auth::user()->id);
+    
+            $data->update([
+                'nik' => $request->username,
+                'username' => $request->username,
+                'tanggalLahir' => $request->tanggalLahir,
+                'namaIbu' => $request->namaIbu,
+                'bbPraHamil' => $request->bbPraHamil,
+                'tinggiBadan' => $request->tinggiBadan,
+                'password' => hash::make($request->username),
+            ]);
+
+            return ResponseFormatter::success($data, "Data Berhasil Diperbarui!");
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal diperbarui. Kesalahan Server!", 500);
+        }
     }
 }

@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bayi', function (Blueprint $table) {
+        Schema::create('posyandu', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->date('tanggalLahir');
-            $table->string('kelamin');
+            $table->text('lokasi');
+            $table->string('lat',50);
+            $table->string('lng',50);
+            $table->string('kontak');
             $table->unsignedBigInteger('id_users');
             $table->foreign('id_users')->references('id')->on('users')->onDelete('cascade');
         });
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bayi');
+        Schema::dropIfExists('posyandu');
     }
 };
