@@ -15,20 +15,14 @@ class makanan extends Seeder
     {
         DB::table('makanan')->insert([
             [
-                'nama' => 'Air Mineral',
-                'gambar' => 'air.jpg',
+                'nama' => 'Makanan Pokok (Nasi, Kentang, Singkong, dll)',
+                'gambar' => 'nasi.jpg',
             ],
         ]);
         DB::table('makanan')->insert([
             [
                 'nama' => 'Lauk Pauk(Ayam, Telur, Ikan, dll)',
                 'gambar' => 'lauk.jpg',
-            ],
-        ]);
-        DB::table('makanan')->insert([
-            [
-                'nama' => 'Makanan Pokok (Nasi, Kentang, Singkong, dll)',
-                'gambar' => 'nasi.jpg',
             ],
         ]);
         DB::table('makanan')->insert([
@@ -41,6 +35,12 @@ class makanan extends Seeder
             [
                 'nama' => 'Buah-Buahan (Apel, Jeruk, Pisang, dll)',
                 'gambar' => 'buah.jpg',
+            ],
+        ]);
+        DB::table('makanan')->insert([
+            [
+                'nama' => 'Air Mineral',
+                'gambar' => 'air.jpg',
             ],
         ]);
     }

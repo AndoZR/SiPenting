@@ -23,6 +23,17 @@ class posyanduController extends Controller
         }
     }
 
+    public function posyByBidan(Request $request) {
+        $id_bidan = $request->id_bidan;
+        try{
+            $dataPosyandu = posyandu::where('id_users',$id_bidan)->get();
+            return ResponseFormatter::success($dataPosyandu, 'Berhasil Mendapatkan Data Posyandu By Bidan!');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+        }
+    }
+
     public function storePosyandu(Request $request) {
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string',

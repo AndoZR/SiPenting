@@ -37,19 +37,30 @@ class kalkulatorStuntingController extends Controller
 
         // Define the threshold values
         $lilaThreshold = 23.5;
-        $hbThreshold = 12;
 
         // Create an array to hold any potential issues
         $issues = [];
 
         // Check LILA
         if ($lila < $lilaThreshold){
-            $issues["lila"][] = "Lingkar lengan terlalu rendah (LILA: $lila cm, harus minimal $lilaThreshold cm)";
+            $issues["lila"][] = "Lingkar lengan atas terlalu rendah (LILA: $lila cm, harus minimal $lilaThreshold cm)";
         }
 
         // Check HB
-        if ($hb < $hbThreshold){
-            $issues["hb"][] = "Hemoglobin terlalu rendah (HB: $hb g/dL, harus minimal $hbThreshold g/dL)";
+        if ($hb == 1){
+            $issues["hb"][] = "Hemoglobin normal (HB: $hb g/dL)";
+        }
+        elseif ($hb == 2){
+            $issues["hb"][] = "Status Anda anemia ringan (HB: $hb g/dL), Rekomendasi HB Normal diatas 11!";
+        }
+        elseif ($hb == 3){
+            $issues["hb"][] = "Status Anda anemia sedang (HB: $hb g/dL), Rekomendasi HB Normal diatas 11!";
+        }
+        elseif ($hb == 4){
+            $issues["hb"][] = "Status Anda anemia berat (HB: $hb g/dL), Rekomendasi HB Normal diatas 11!";
+        }
+        elseif ($hb == 5){
+            $issues["hb"][] = "Segera cek kadar Hemoglobin di puskesmas terdekat!";
         }
 
         // cek bb

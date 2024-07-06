@@ -44,6 +44,7 @@ Route::middleware(['auth:api', 'role:2'])->group(function () {
     Route::get('menu', [menuController::class, 'index'])->name('menu');
 
     Route::group(['prefix'=>'posyandu'], function () {
+        Route::post('/posyByBidan', [posyanduController::class, 'posyByBidan'])->name('posyByBidan');
         Route::post('/storePosyandu', [posyanduController::class, 'storePosyandu'])->name('storePosyandu');
         Route::post('/updatePosyandu', [posyanduController::class, 'updatePosyandu'])->name('updatePosyandu');
         Route::post('/deletePosyandu', [posyanduController::class, 'deletePosyandu'])->name('deletePosyandu');
