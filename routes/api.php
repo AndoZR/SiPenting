@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\bayiController;
+use App\Http\Controllers\menuController;
+use App\Http\Controllers\artikelController;
+use App\Http\Controllers\posyanduController;
 use App\Http\Controllers\kalkulatorGiziController;
 use App\Http\Controllers\kalkulatorStuntingController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\menuController;
-use App\Http\Controllers\posyanduController;
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register']);
@@ -18,6 +19,7 @@ Route::middleware(['auth:api', 'role:1,2'])->group(function () {
 
     Route::group(['prefix'=>'posyandu'], function () {
         Route::get('/', [posyanduController::class, 'index'])->name('posyandu');
+        Route::get('/jadwal', [posyanduController::class, 'getJadwal'])->name('getJadwal');
     });
 });
 
@@ -48,10 +50,18 @@ Route::middleware(['auth:api', 'role:2'])->group(function () {
         Route::post('/storePosyandu', [posyanduController::class, 'storePosyandu'])->name('storePosyandu');
         Route::post('/updatePosyandu', [posyanduController::class, 'updatePosyandu'])->name('updatePosyandu');
         Route::post('/deletePosyandu', [posyanduController::class, 'deletePosyandu'])->name('deletePosyandu');
-        Route::get('/jadwal', [posyanduController::class, 'getJadwal'])->name('getJadwal');
+
         Route::post('/storeJadwal', [posyanduController::class, 'storeJadwal'])->name('storeJadwal');
         Route::post('/updateJadwal', [posyanduController::class, 'updateJadwal'])->name('updateJadwal');
         Route::post('/deleteJadwal', [posyanduController::class, 'deleteJadwal'])->name('deleteJadwal');
+    });
+
+    Route::group(['prefix'=>'artikel'], function () {
+        Route::get('/',[artikelController::class, 'index'])->name('artikel');
+        Route::post('/storeArtikel',[artikelController::class, 'storeArtikel'])->name('storeArtikel');
+        Route::post('/updateArtikel',[artikelController::class, 'updateArtikel'])->name('updateArtikel');
+        Route::post('/deleteArtikel',[artikelController::class, 'deleteArtikel'])->name('deleteArtikel');
+
     });
 });
 

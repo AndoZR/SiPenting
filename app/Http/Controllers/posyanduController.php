@@ -66,11 +66,10 @@ class posyanduController extends Controller
 
     public function updatePosyandu(Request $request) {
         $validator = Validator::make($request->all(), [
-            'nama' => 'required|string',
-            'lokasi' => 'required|string',
-            'lat' => 'required|string|max:50',
-            'lng' => 'required|string|max:50',
-            'kontak' => 'required',
+            'nama' => 'string|nullable',
+            'lokasi' => 'string|nullable',
+            'lat' => 'string|max:50|nullable',
+            'lng' => 'string|max:50|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -79,14 +78,16 @@ class posyanduController extends Controller
 
         try {
             $data = posyandu::find($request->idPosyandu);
-            $data->update([
-                'nama' => $request->nama,
-                'lokasi' => $request->lokasi,
-                'lat' => $request->lat,
-                'lng' => $request->lng,
-                'kontak' => $request->kontak,
-            ]);
+            $updateData = $request->only(['nama', 'lokasi', 'lat', 'lng', 'kontak']);
 
+            // Filter out fields that are not present in the request or are null
+            $updateData = array_filter($updateData, function ($value) {
+                return !is_null($value);
+            });
+    
+            if (!empty($updateData)) {
+                $data->update($updateData);
+            }
             return ResponseFormatter::success($data, "Data Posyandu Berhasil Diubah!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
