@@ -30,7 +30,7 @@ class posyanduController extends Controller
             return ResponseFormatter::success($dataPosyandu, 'Berhasil Mendapatkan Data Posyandu By Bidan!');
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -40,11 +40,12 @@ class posyanduController extends Controller
             'lokasi' => 'required|string',
             'lat' => 'required|string',
             'lng' => 'required|string',
-            'kontak' => 'required',
+            'kontak' => 'required|int',
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
         };
 
         try {
@@ -60,7 +61,7 @@ class posyanduController extends Controller
             return ResponseFormatter::success($data, "Data Posyandu Berhasil Dibuat!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -73,7 +74,8 @@ class posyanduController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
         };
 
         try {
@@ -91,7 +93,7 @@ class posyanduController extends Controller
             return ResponseFormatter::success($data, "Data Posyandu Berhasil Diubah!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -107,13 +109,18 @@ class posyanduController extends Controller
     }
 
     // Jadwal posyandu
-    public function getJadwal() {
+    public function getJadwal(Request $request) {
         try{
-            $dataJadwal = jadwal_posyandu::get();
+            if($request->id_posyandu){
+                $dataJadwal = jadwal_posyandu::where('id_posyandu', $request->id_posyandu)->get();
+            }else{
+                $dataJadwal = jadwal_posyandu::get();
+            }
+        
             return ResponseFormatter::success($dataJadwal, 'Berhasil Mendapatkan Data!');
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -125,7 +132,8 @@ class posyanduController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
         };
 
         try {
@@ -140,7 +148,7 @@ class posyanduController extends Controller
             return ResponseFormatter::success($data, "Data Jadwal Berhasil Dibuat!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -152,7 +160,8 @@ class posyanduController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
         };
 
         try {
@@ -168,7 +177,7 @@ class posyanduController extends Controller
             return ResponseFormatter::success($data, "Data Jadwal Berhasil Diubah!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -179,7 +188,7 @@ class posyanduController extends Controller
             return ResponseFormatter::success("Data Jadwal Berhasil Dihapus!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal dihapus. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 }

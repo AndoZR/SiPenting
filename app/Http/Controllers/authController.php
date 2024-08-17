@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\User;
+use App\Models\villages;
+use App\Models\districts;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Database\Seeders\userSeeder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -21,26 +22,47 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    // public function login()
+    // {
+    //     $credentials = request(['username', 'password']);
+    //     $username = $credentials['username'];
+        
+    //     // Check if the username exists in the database
+    //     $userExists = User::where('username', $username)->exists();
+    
+    //     if (!$userExists) {
+    //         return response()->json(['error' => 'Pengguna Tidak Ditemukan, Pastikan Username Anda Benar!'], 404);
+    //     }
+
+    //     // $credentials = request(['username', 'password']);
+
+    //     if (! $token = auth()->attempt($credentials)) {
+    //         return response()->json(['error' => 'Unauthorized'], 401);
+    //     }
+
+    //     return $this->respondWithToken($token);
+    // }
+
     public function login()
     {
-        $credentials = request(['username', 'password']);
-        $username = $credentials['username'];
+        // Ambil hanya username dari request
+        $username = request('username');
         
-        // Check if the username exists in the database
-        $userExists = User::where('username', $username)->exists();
+        // Cek jika username ada di database
+        $user = User::where('username', $username)->first();
     
-        if (!$userExists) {
-            return response()->json(['error' => 'Pengguna Tidak Ditemukan, Pastikan Username Anda Benar!'], 404);
+        if (!$user) {
+            return ResponseFormatter::error(null,"Pengguna Tidak Ditemukan, Pastikan Username Anda Benar!",422);
+            // return response()->json(['error' => ''], 404);
         }
-
-        // $credentials = request(['username', 'password']);
-
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
+    
+        // Generate token jika username ditemukan
+        // Biasanya menggunakan Laravel Passport atau Laravel Sanctum untuk token
+        $token = auth()->login($user);
+    
         return $this->respondWithToken($token);
     }
+    
 
     /**
      * Get the authenticated User.
@@ -93,58 +115,38 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        if($request->role == 1){
             $validator = Validator::make($request->all(), [
                 'username' => 'required|integer|digits:16|unique:users,nik',
-                'tanggalLahir' => 'required|date',
+                // 'tanggalLahir' => 'required|date',
                 'namaIbu' => 'required|string|max:255',
-                'tinggiBadan' => 'required|integer',
+                // 'tinggiBadan' => 'required|integer',
+                'id_desa' => 'required',
             ]);
      
             if ($validator->fails()) {
-                return ResponseFormatter::error(null,$validator->errors(),422);
+                // Mendapatkan pesan error tanpa field name
+                $errors = $validator->errors()->all();
+                
+                return ResponseFormatter::error(null,$errors[0],422);
             };
     
             try {
                 $dataUser = User::create([
                     'username' => $request->username,
                     'nik' => $request->username,
-                    'tanggalLahir' => $request->tanggalLahir,
+                    // 'tanggalLahir' => $request->tanggalLahir,
                     'namaIbu' => $request->namaIbu,
-                    'bbPraHamil' => $request->bbPraHamil,
-                    'tinggiBadan' => $request->tinggiBadan,
-                    'password' => Hash::make($request->password),
+                    // 'tinggiBadan' => $request->tinggiBadan,
+                    'password' => Hash::make($request->username),
                     'role' => 1,
+                    'id_villages' => $request->id_desa,
                 ]);
     
                 return ResponseFormatter::success($dataUser, "Data User Berhasil Dibuat!");
             } catch (Exception $e) {
                 Log::error($e->getMessage());
-                return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+                return ResponseFormatter::error(null, $e->getMessage(), 500);
             }
-        }else{
-            $validator = Validator::make($request->all(), [
-                'username' => 'required|unique:users,nik',
-            ]);
-     
-            if ($validator->fails()) {
-                return ResponseFormatter::error(null,$validator->errors(),422);
-            };
-    
-            try {
-                $dataUser = User::create([
-                    'username' => $request->username,
-                    'nik' => $request->username,
-                    'password' => Hash::make($request->password),
-                    'role' => 2,
-                ]);
-    
-                return ResponseFormatter::success($dataUser, "Data User Berhasil Dibuat!");
-            } catch (Exception $e) {
-                Log::error($e->getMessage());
-                return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
-            }
-        }
     }
 
     public function getUser()
@@ -163,7 +165,12 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            // Mendapatkan pesan error tanpa field name
+            $errors = $validator->errors()->all();
+                
+            // // Menggabungkan pesan error menjadi satu string
+            // $errorMessage = implode(' ', $errors);
+            return ResponseFormatter::error(null,$errors[0],422);
         };
 
         try{
@@ -182,7 +189,59 @@ class AuthController extends Controller
             return ResponseFormatter::success($data, "Data Berhasil Diperbarui!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal diperbarui. Kesalahan Server!", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
+    }
+
+    public function viewRegisterBidan() {
+        return view('registerBidan');
+    }
+    
+    public function registerBidan(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'nik' => 'required|unique:users,nik',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->route('viewRegisterBidan')->with('error', $validator->errors());
+        };
+
+        try {
+            $dataUser = User::create([
+                'username' => $request->nik,
+                'nik' => $request->nik,
+                'password' => Hash::make($request->nik),
+                'role' => 2,
+            ]);
+
+            return redirect()->route('viewRegisterBidan')->with('success', 'Data User Berhasil Dibuat!');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->route('viewRegisterBidan')->with('error', $e->getMessage());
+        }
+    }
+
+    public function getKecamatan() {
+        $data = districts::where('regency_id',3511)->get();
+
+        return ResponseFormatter::success($data, 'Berhasil Mendapatkan Data!');
+    }
+
+    public function getDesa(Request $request) {
+        try{
+            if(isset($request->id_kecamatan)){
+                $data = villages::where('district_id',$request->id_kecamatan)->get();
+                return ResponseFormatter::success($data, 'Berhasil Mendapatkan Data!');
+            }else{
+                $data = villages::whereIn('district_id',
+                [3511010,3511020,3511030,3511031,3511040,3511050,3511060,3511061,3511070,3511080,3511090,3511100,
+                3511110,3511111,3511120,3511130,3511140,3511141,3511150,3511151,3511152,3511160,3511170]
+                )->get();
+                return ResponseFormatter::success($data, 'Berhasil Mendapatkan Data!');
+            }
+        }catch(Exception $e){
+            return ResponseFormatter::error(null,$e->getMessage(),500);
+        }
+
     }
 }

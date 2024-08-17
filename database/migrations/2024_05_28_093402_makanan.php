@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->text('gambar');
+            $table->text('deskripsi');
+            $table->text('satuan');
             // $table->unsignedBigInteger('id_jenis_gizi');
             // $table->foreign('id_jenis_gizi')->references('id')->on('jenis_gizi')->onDelete('cascade');
         });

@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -11,6 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $path = database_path('migrations/indonesia.sql');
+        $sql = file_get_contents($path);
+        DB::unprepared($sql);
+        
+        // Schema::create('desa', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('nama');
+        //     $table->char('id_kecamatan', 7);
+        //     $table->foreign('id_kecamatan')->references('kecamatan_id')->on('kecamatan')->onDelete('cascade');
+        // });
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->char('nik',16);
@@ -23,6 +35,8 @@ return new class extends Migration
             // $table->string('email')->unique();
             // $table->timestamp('email_verified_at')->nullable();
             $table->integer('role');
+            $table->char('id_villages',10)->nullable();
+            $table->foreign('id_villages')->references('id')->on('villages')->onDelete('cascade');
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
@@ -52,5 +66,9 @@ return new class extends Migration
         Schema::dropIfExists('users');
         // Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+
+        Schema::dropIfExists('keecamatan');
+        Schema::dropIfExists('kabupaten');
+        Schema::dropIfExists('provinsi');
     }
 };

@@ -15,6 +15,7 @@ class userSeeder extends Seeder
      */
     public function run(): void
     {
+        // inser user
         $faker = Faker::create();
         $nowDate = date('Y-m-d');
         for($i = 0; $i <= 3; $i++) {
@@ -27,6 +28,7 @@ class userSeeder extends Seeder
                     'bbPraHamil' => 50.5,
                     'tinggiBadan' => 160,
                     'role' => 1,
+                    'id_villages' => 1101010001,
                     'password' => hash::make(3509200904020000 + $i),
                     'created_at' => $nowDate,
                 ],
@@ -42,6 +44,7 @@ class userSeeder extends Seeder
                 'bbPraHamil' => null,
                 'tinggiBadan' => null,
                 'role' => 2,
+                'id_villages' => 1101010001,
                 'password' => hash::make('3509200904020021'),
                 'created_at' => $nowDate,
             ],

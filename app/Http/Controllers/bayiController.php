@@ -39,7 +39,7 @@ class bayiController extends Controller
             return ResponseFormatter::success($dataBayi,'Data Bayi Berhasil Didapat!');
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -51,7 +51,8 @@ class bayiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            $errors = $validator->errors()->all();
+            return ResponseFormatter::error(null, $errors[0], 422);
         };
 
         try {
@@ -65,7 +66,7 @@ class bayiController extends Controller
             return ResponseFormatter::success($test, "Data Bayi Berhasil Dibuat!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -77,7 +78,8 @@ class bayiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error(null,$validator->errors(),422);
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
         };
 
         try {
@@ -91,7 +93,7 @@ class bayiController extends Controller
             return ResponseFormatter::success($test, "Data Bayi Berhasil Diubah!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -102,7 +104,7 @@ class bayiController extends Controller
             return ResponseFormatter::success("Data Bayi Berhasil Dihapus!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal dihapus. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
     }
 }

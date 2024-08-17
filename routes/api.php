@@ -11,6 +11,8 @@ use App\Http\Controllers\kalkulatorStuntingController;
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register']);
+Route::get('kecamatan', [AuthController::class, 'getKecamatan']);
+Route::post('desa', [AuthController::class, 'getDesa']);
 
 Route::middleware(['auth:api', 'role:1,2'])->group(function () {
     Route::get('getuser', [AuthController::class, 'getUser']);
@@ -19,7 +21,7 @@ Route::middleware(['auth:api', 'role:1,2'])->group(function () {
 
     Route::group(['prefix'=>'posyandu'], function () {
         Route::get('/', [posyanduController::class, 'index'])->name('posyandu');
-        Route::get('/jadwal', [posyanduController::class, 'getJadwal'])->name('getJadwal');
+        Route::post('/jadwal', [posyanduController::class, 'getJadwal'])->name('getJadwal');
     });
 });
 

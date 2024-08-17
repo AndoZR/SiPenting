@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class jadwal_posyandu extends Model
 {
@@ -20,4 +21,10 @@ class jadwal_posyandu extends Model
         'id_users',
         'deskripsi',
     ];
+
+    // Accessor to format 'waktu'
+    public function getWaktuAttribute($value)
+    {
+        return Carbon::createFromFormat('H:i:s', $value)->format('H:i');
+    }
 }

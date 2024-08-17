@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class makanan extends Model
+class districts extends Model
 {
     use HasFactory;
 
-    protected $table = 'makanan';
+    protected $table = 'districts';
 
-    protected $fillable = [
+    public $timestamps = false;
+
+    protected $fillable= [
+        'districts_id ',
+        'regency_id ',
         'nama',
-        'gambar',
-        'deskripsi',
-        'satuan',
     ];
 }

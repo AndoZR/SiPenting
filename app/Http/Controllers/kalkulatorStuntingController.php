@@ -4,17 +4,29 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\bayi;
+use App\Models\data_stunt;
 use App\Models\berat_badan;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
-use App\Models\bayi;
-use App\Models\data_stunt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class kalkulatorStuntingController extends Controller
 {
     public function cekStuntingIbu(Request $request){
+        $validator = Validator::make($request->all(), [
+            'lila' => 'required|numeric',
+            'hb' => 'required|numeric',
+            'bbNow' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
+        };
+
         $lila = $request->lila;
         $hb = $request->hb;
         $bbPraHamil = Auth::user()->bbPraHamil;
@@ -32,7 +44,7 @@ class kalkulatorStuntingController extends Controller
             ]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return ResponseFormatter::error($e->getMessage(), "Data gagal disimpan. Kesalahan Server", 500);
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         }
 
         // Define the threshold values
@@ -47,17 +59,18 @@ class kalkulatorStuntingController extends Controller
         }
 
         // Check HB
+        // dd($hb);
         if ($hb == 1){
-            $issues["hb"][] = "Hemoglobin normal (HB: $hb g/dL)";
+            $issues["hb"][] = "Hemoglobin normal";
         }
         elseif ($hb == 2){
-            $issues["hb"][] = "Status Anda anemia ringan (HB: $hb g/dL), Rekomendasi HB Normal diatas 11!";
+            $issues["hb"][] = "Status Anda anemia ringan, Rekomendasi HB Normal diatas 11!";
         }
         elseif ($hb == 3){
-            $issues["hb"][] = "Status Anda anemia sedang (HB: $hb g/dL), Rekomendasi HB Normal diatas 11!";
+            $issues["hb"][] = "Status Anda anemia sedang, Rekomendasi HB Normal diatas 11!";
         }
         elseif ($hb == 4){
-            $issues["hb"][] = "Status Anda anemia berat (HB: $hb g/dL), Rekomendasi HB Normal diatas 11!";
+            $issues["hb"][] = "Status Anda anemia berat, Rekomendasi HB Normal diatas 11!";
         }
         elseif ($hb == 5){
             $issues["hb"][] = "Segera cek kadar Hemoglobin di puskesmas terdekat!";
@@ -90,7 +103,7 @@ class kalkulatorStuntingController extends Controller
         if (!empty($issues)) {
             return ResponseFormatter::success($issues, "Data stunting Ibu berhasil diproses!");
         } else {
-            return ResponseFormatter::success("Semua parameter berada dalam batas yang aman.");
+            return ResponseFormatter::success("Kesalahan Server");
         }
     }
 
@@ -106,7 +119,7 @@ class kalkulatorStuntingController extends Controller
         unset($heightStandard['id']);
         unset($heightStandard['kelamin']);
         unset($heightStandard['Umur (bulan)']);
-
+        
         $heightStandardArray = $heightStandard->toArray();
 
         $toleransiPersentase = 2; // Toleransi dalam persentase, misalnya 5%
@@ -133,13 +146,13 @@ class kalkulatorStuntingController extends Controller
         };
 
         if($columnName == 'Panjang Badan (cm) -3 SD'){
-            return ResponseFormatter::success('Sangat pendek (severely stunted)','Data telah diproses!');
+            return ResponseFormatter::success(1,'Data telah diproses!');
         }elseif($columnName == 'Panjang Badan (cm) -2 SD' || $columnName == 'Panjang Badan (cm) -1 SD'){
-            return ResponseFormatter::success('Pendek (stunted)','Data telah diproses!');
+            return ResponseFormatter::success(2,'Data telah diproses!');
         }elseif($columnName == 'Panjang Badan (cm) Median' || $columnName == 'Panjang Badan (cm) +1 SD' || $columnName == 'Panjang Badan (cm) +1 SD'){
-            return ResponseFormatter::success('Normal','Data telah diproses!');
+            return ResponseFormatter::success(3,'Data telah diproses!');
         }elseif($columnName == 'Panjang Badan (cm) +3 SD'){
-            return ResponseFormatter::success('Tinggi','Data telah diproses!');
+            return ResponseFormatter::success(4,'Data telah diproses!');
         }
 
     }

@@ -17,30 +17,40 @@ class makanan extends Seeder
             [
                 'nama' => 'Makanan Pokok (Nasi, Kentang, Singkong, dll)',
                 'gambar' => 'nasi.jpg',
+                'deskripsi' => '1 sdm setara dengan 14 gr',
+                'satuan' => 'SDM',
             ],
         ]);
         DB::table('makanan')->insert([
             [
                 'nama' => 'Lauk Pauk(Ayam, Telur, Ikan, dll)',
                 'gambar' => 'lauk.jpg',
+                'deskripsi' => '1 sdm setara dengan 14 gr',
+                'satuan' => 'SDM',
             ],
         ]);
         DB::table('makanan')->insert([
             [
                 'nama' => 'Sayur-Sayuran (Bayam, Wortel, Brokoli, dll',
                 'gambar' => 'sayur.jpeg',
+                'deskripsi' => '1 sdm setara dengan 14 gr',
+                'satuan' => 'SDM',
             ],
         ]);
         DB::table('makanan')->insert([
             [
                 'nama' => 'Buah-Buahan (Apel, Jeruk, Pisang, dll)',
                 'gambar' => 'buah.jpg',
+                'deskripsi' => '1 sdm setara dengan 14 gr',
+                'satuan' => 'SDM',
             ],
         ]);
         DB::table('makanan')->insert([
             [
-                'nama' => 'Air Mineral',
+                'nama' => 'Cairan (Air, Susu, dll)',
                 'gambar' => 'air.jpg',
+                'deskripsi' => '1 gelas setara dengan 250 ml',
+                'satuan' => 'gelas',
             ],
         ]);
     }
