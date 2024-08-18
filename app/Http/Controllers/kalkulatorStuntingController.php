@@ -108,53 +108,56 @@ class kalkulatorStuntingController extends Controller
     }
 
     public function cekStuntingAnak(Request $request){
-        // $idUser = Auth::user()->id;
-        $idBayi = $request->idBayi;
-        $anak = bayi::where('id', $idBayi)->first();
-        $umur = round(Carbon::parse($anak->tanggalLahir)->diffInMonths(now()));        
-        $tinggiBadan = $request->tinggiBadan;
+        try{
+            $idBayi = $request->idBayi;
+            $anak = bayi::where('id', $idBayi)->first();
+            $umur = round(Carbon::parse($anak->tanggalLahir)->diffInMonths(now()));        
+            $tinggiBadan = $request->tinggiBadan;
 
-        $heightStandard = data_stunt::where('Umur (bulan)', (int)$umur)->first();
-        // Menghapus kolom "id" dan "kelamin" dari array $heightStandard
-        unset($heightStandard['id']);
-        unset($heightStandard['kelamin']);
-        unset($heightStandard['Umur (bulan)']);
-        
-        $heightStandardArray = $heightStandard->toArray();
+            $heightStandard = data_stunt::where('Umur (bulan)', (int)$umur)->first();
+            // Menghapus kolom "id" dan "kelamin" dari array $heightStandard
+            unset($heightStandard['id']);
+            unset($heightStandard['kelamin']);
+            unset($heightStandard['Umur (bulan)']);
+            
+            $heightStandardArray = $heightStandard->toArray();
 
-        $toleransiPersentase = 2; // Toleransi dalam persentase, misalnya 5%
+            $toleransiPersentase = 2; // Toleransi dalam persentase, misalnya 5%
 
-        // Mencari nama kolom yang sesuai dengan input
-        $columnName = '';
-        foreach ($heightStandardArray as $key => $value) {
+            // Mencari nama kolom yang sesuai dengan input
+            $columnName = '';
+            foreach ($heightStandardArray as $key => $value) {
 
-            // Menghitung toleransi tinggi badan berdasarkan persentase
-            $valueFloat = (float) $value;
-            $toleransi = $valueFloat * ($toleransiPersentase / 100);
-        
-            // Memeriksa apakah tinggi badan input mendekati nilai SD
-            if ($tinggiBadan >= $valueFloat - $toleransi && $tinggiBadan <= $valueFloat + $toleransi) {
-                $columnName = $key;
-                break;
+                // Menghitung toleransi tinggi badan berdasarkan persentase
+                $valueFloat = (float) $value;
+                $toleransi = $valueFloat * ($toleransiPersentase / 100);
+            
+                // Memeriksa apakah tinggi badan input mendekati nilai SD
+                if ($tinggiBadan >= $valueFloat - $toleransi && $tinggiBadan <= $valueFloat + $toleransi) {
+                    $columnName = $key;
+                    break;
+                }
             }
-        }
 
-        if($tinggiBadan < $heightStandardArray['Panjang Badan (cm) -3 SD']){
-            return ResponseFormatter::success('Sangat pendek (severely stunted)','Data telah diproses!');
-        }elseif($tinggiBadan > $heightStandardArray['Panjang Badan (cm) +3 SD']){
-            return ResponseFormatter::success('Tinggi','Data telah diproses!');
+            if($tinggiBadan < $heightStandardArray['Panjang Badan (cm) -3 SD']){
+                return ResponseFormatter::success('Sangat pendek (severely stunted)','Data telah diproses!');
+            }elseif($tinggiBadan > $heightStandardArray['Panjang Badan (cm) +3 SD']){
+                return ResponseFormatter::success('Tinggi','Data telah diproses!');
+            };
+
+            if($columnName == 'Panjang Badan (cm) -3 SD'){
+                return ResponseFormatter::success(1,'Data telah diproses!');
+            }elseif($columnName == 'Panjang Badan (cm) -2 SD' || $columnName == 'Panjang Badan (cm) -1 SD'){
+                return ResponseFormatter::success(2,'Data telah diproses!');
+            }elseif($columnName == 'Panjang Badan (cm) Median' || $columnName == 'Panjang Badan (cm) +1 SD' || $columnName == 'Panjang Badan (cm) +1 SD'){
+                return ResponseFormatter::success(3,'Data telah diproses!');
+            }elseif($columnName == 'Panjang Badan (cm) +3 SD'){
+                return ResponseFormatter::success(4,'Data telah diproses!');
+            }
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
         };
-
-        if($columnName == 'Panjang Badan (cm) -3 SD'){
-            return ResponseFormatter::success(1,'Data telah diproses!');
-        }elseif($columnName == 'Panjang Badan (cm) -2 SD' || $columnName == 'Panjang Badan (cm) -1 SD'){
-            return ResponseFormatter::success(2,'Data telah diproses!');
-        }elseif($columnName == 'Panjang Badan (cm) Median' || $columnName == 'Panjang Badan (cm) +1 SD' || $columnName == 'Panjang Badan (cm) +1 SD'){
-            return ResponseFormatter::success(3,'Data telah diproses!');
-        }elseif($columnName == 'Panjang Badan (cm) +3 SD'){
-            return ResponseFormatter::success(4,'Data telah diproses!');
-        }
-
     }
 }
  

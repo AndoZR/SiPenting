@@ -25,31 +25,36 @@ class kalkulatorGiziController extends Controller
     }
 
     public function cekGizi(Request $request) {   
-        $dataMakanan = $request->data;
-        // $dataMakanan = $request->request->all();
-        $collectMakanan = [];
-        $collectSdm = [];
-        $bayi = bayi::where('id',$request->idBayi)->first();
-
-        // Menguraikan JSON menjadi array PHP
-        $dataMakanan = json_decode($dataMakanan, true);
-
-        // Memastikan JSON berhasil diuraikan
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['error' => 'Invalid JSON'], 400);
-        }
-
-        // Mencari selisih bulan(Umur Bayi)
-        $umurBayi = round(Carbon::parse($bayi->tanggalLahir)->diffInMonths(now()));
-
-        foreach($dataMakanan as $item){
-            $collectMakanan[] = $item[0];
-            $collectSdm[] = $item[1];
-        }
-
-        $hasil = $this->cekMakan($dataMakanan,$umurBayi,$collectMakanan);
-
-        return ResponseFormatter::success($hasil, "Data Perhitungan Berhasil Didapatkan!");
+        try{
+            $dataMakanan = $request->data;
+            // $dataMakanan = $request->request->all();
+            $collectMakanan = [];
+            $collectSdm = [];
+            $bayi = bayi::where('id',$request->idBayi)->first();
+    
+            // Menguraikan JSON menjadi array PHP
+            $dataMakanan = json_decode($dataMakanan, true);
+    
+            // Memastikan JSON berhasil diuraikan
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json(['error' => 'Invalid JSON'], 400);
+            }
+    
+            // Mencari selisih bulan(Umur Bayi)
+            $umurBayi = round(Carbon::parse($bayi->tanggalLahir)->diffInMonths(now()));
+    
+            foreach($dataMakanan as $item){
+                $collectMakanan[] = $item[0];
+                $collectSdm[] = $item[1];
+            }
+    
+            $hasil = $this->cekMakan($dataMakanan,$umurBayi,$collectMakanan);
+    
+            return ResponseFormatter::success($hasil, "Data Perhitungan Berhasil Didapatkan!");
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
+        };
     }
 
     private function cekMakan($dataMakanan,$umurBayi,$collectMakanan){
@@ -100,11 +105,11 @@ class kalkulatorGiziController extends Controller
                     $hasil["makanan"][] = $item[0];
                     $hasil["keterangan"][] = "Cukup";
                     $hasil["kecukupan"][] = 2;
-                }elseif($item[1] < $$gelas){
+                }elseif($item[1] < $gelas){
                     $hasil["makanan"][] = $item[0];
                     $hasil["keterangan"][] = "Kurang";
                     $hasil["kecukupan"][] = 1;
-                }elseif($item[1] > $$gelas){
+                }elseif($item[1] > $gelas){
                     $hasil["makanan"][] = $item[0];
                     $hasil["keterangan"][] = "Berlebihan";
                     $hasil["kecukupan"][] = 3;
