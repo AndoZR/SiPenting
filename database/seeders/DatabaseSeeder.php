@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             makanan::class,
             bayi::class,
             dataStunt::class,
+            artikelSeeder::class,
         ]);
     }
 }

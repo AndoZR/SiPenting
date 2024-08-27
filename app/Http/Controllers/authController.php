@@ -196,6 +196,10 @@ class AuthController extends Controller
     public function viewRegisterBidan() {
         return view('registerBidan');
     }
+
+    public function viewLogin() {
+        return view('registerBidan');
+    }
     
     public function registerBidan(Request $request) {
         $validator = Validator::make($request->all(), [

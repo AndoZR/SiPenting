@@ -55,25 +55,25 @@ class kalkulatorStuntingController extends Controller
 
         // Check LILA
         if ($lila < $lilaThreshold){
-            $issues["lila"][] = "Lingkar lengan atas terlalu rendah (LILA: $lila cm, harus minimal $lilaThreshold cm)";
+            $issues["lila"] = "Lingkar lengan atas terlalu rendah (LILA: $lila cm, harus minimal $lilaThreshold cm)";
         }
 
         // Check HB
         // dd($hb);
         if ($hb == 1){
-            $issues["hb"][] = "Hemoglobin normal";
+            $issues["hb"] = "Hemoglobin normal";
         }
         elseif ($hb == 2){
-            $issues["hb"][] = "Status Anda anemia ringan, Rekomendasi HB Normal diatas 11!";
+            $issues["hb"] = "Status Anda anemia ringan, Rekomendasi HB Normal diatas 11!";
         }
         elseif ($hb == 3){
-            $issues["hb"][] = "Status Anda anemia sedang, Rekomendasi HB Normal diatas 11!";
+            $issues["hb"] = "Status Anda anemia sedang, Rekomendasi HB Normal diatas 11!";
         }
         elseif ($hb == 4){
-            $issues["hb"][] = "Status Anda anemia berat, Rekomendasi HB Normal diatas 11!";
+            $issues["hb"] = "Status Anda anemia berat, Rekomendasi HB Normal diatas 11!";
         }
         elseif ($hb == 5){
-            $issues["hb"][] = "Segera cek kadar Hemoglobin di puskesmas terdekat!";
+            $issues["hb"] = "Segera cek kadar Hemoglobin di puskesmas terdekat!";
         }
 
         // cek bb
@@ -82,21 +82,21 @@ class kalkulatorStuntingController extends Controller
         }
         $IMT = $bbPraHamil / (($tinggiBadan/100)**2);
         if ($IMT < 18.5){
-            $issues["IMT"][] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 12.5 - 18 Kg";
+            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 12.5 - 18 Kg";
         }elseif ($IMT >= 18.5 && $IMT <= 24.9){
-            $issues["IMT"][] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 11.5 - 16 Kg";
+            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 11.5 - 16 Kg";
         }elseif ($IMT >= 25 && $IMT <= 29.9){
-            $issues["IMT"][] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 7 - 11.5 Kg";
+            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 7 - 11.5 Kg";
         }elseif ($IMT >= 30){
-            $issues["IMT"][] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 5 - 9 Kg";
+            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 5 - 9 Kg";
         }
 
         // Cek Usia
         $usia = round(Carbon::parse(Auth::user()->tanggalLahir)->diffInYears(now()));
         if ($usia < 19){
-            $issues["usia"][] = "Usia Ibu: $usia kurang dar 19th beresiko stunting, segera periksa ke bidan!";
+            $issues["usia"] = "Usia Ibu: $usia kurang dar 19th beresiko stunting, segera periksa ke bidan!";
         }elseif ($usia > 35){
-            $issues["usia"][] = "Usia Ibu: $usia kurang dar 35th beresiko stunting, segera periksa ke bidan!";
+            $issues["usia"] = "Usia Ibu: $usia kurang dar 35th beresiko stunting, segera periksa ke bidan!";
         }
 
         // Return the response based on the findings
@@ -140,9 +140,9 @@ class kalkulatorStuntingController extends Controller
             }
 
             if($tinggiBadan < $heightStandardArray['Panjang Badan (cm) -3 SD']){
-                return ResponseFormatter::success('Sangat pendek (severely stunted)','Data telah diproses!');
+                return ResponseFormatter::success(1,'Data telah diproses!');
             }elseif($tinggiBadan > $heightStandardArray['Panjang Badan (cm) +3 SD']){
-                return ResponseFormatter::success('Tinggi','Data telah diproses!');
+                return ResponseFormatter::success(4,'Data telah diproses!');
             };
 
             if($columnName == 'Panjang Badan (cm) -3 SD'){

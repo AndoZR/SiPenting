@@ -58,13 +58,12 @@ Route::middleware(['auth:api', 'role:2'])->group(function () {
         Route::post('/deleteJadwal', [posyanduController::class, 'deleteJadwal'])->name('deleteJadwal');
     });
 
-    Route::group(['prefix'=>'artikel'], function () {
-        Route::get('/',[artikelController::class, 'index'])->name('artikel');
-        Route::post('/storeArtikel',[artikelController::class, 'storeArtikel'])->name('storeArtikel');
-        Route::post('/updateArtikel',[artikelController::class, 'updateArtikel'])->name('updateArtikel');
-        Route::post('/deleteArtikel',[artikelController::class, 'deleteArtikel'])->name('deleteArtikel');
-
-    });
+    // Route::group(['prefix'=>'artikel'], function () {
+    //     Route::get('/',[artikelController::class, 'index'])->name('artikel');
+    //     Route::post('/storeArtikel',[artikelController::class, 'storeArtikel'])->name('storeArtikel');
+    //     Route::post('/updateArtikel',[artikelController::class, 'updateArtikel'])->name('updateArtikel');
+    //     Route::post('/deleteArtikel',[artikelController::class, 'deleteArtikel'])->name('deleteArtikel');
+    // });
 });
 
 

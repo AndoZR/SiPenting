@@ -74,11 +74,12 @@ class kalkulatorGiziController extends Controller
         $hasil = [];
 
         // mencari makanan yang tidak ada di database maka dia kurang
-        $dbMakananExc = makanan::whereNotIn("id", $collectMakanan)->where('id', '!=', 1)->get("nama");
+        $dbMakananExc = makanan::whereNotIn("id", $collectMakanan)->get("nama");
         foreach($dbMakananExc as $x){
-            $hasil["makanan"][] = $x->nama;
-            $hasil["keterangan"][] = "Kurang";
-            $hasil["kecukupan"][] = 1;
+            $hasil[] = ["makanan" => $x->nama,
+                        "keterangan" => "Kurang",
+                        "kecukupan" => 1,
+                        ];
         }
 
         $collectNamaMakanan = [];
@@ -93,41 +94,48 @@ class kalkulatorGiziController extends Controller
             $item[0] = $collectNamaMakanan[$index];
 
             if ($item[1] == 0){
-                $hasil["makanan"][] = $item[0];
-                $hasil["keterangan"][] = "Kurang";
-                $hasil["kecukupan"][] = 1;
+                $hasil[] = ["makanan" => $item[0],
+                            "keterangan" => "Kurang",
+                            "kecukupan" => 1,
+                            ];
                 $index++;
                 continue;
             } // kalo ada sdm 0 return tidak terpenuhi
 
             if($item[0] == "Cairan (Air, Susu, dll)"){ //exception buat air mineral, dia make mili
                 if($item[1] == $gelas){
-                    $hasil["makanan"][] = $item[0];
-                    $hasil["keterangan"][] = "Cukup";
-                    $hasil["kecukupan"][] = 2;
+                    $hasil[] = ["makanan" => $item[0],
+                                "keterangan" => "Cukup",
+                                "kecukupan" => 2,
+                                ];
                 }elseif($item[1] < $gelas){
-                    $hasil["makanan"][] = $item[0];
-                    $hasil["keterangan"][] = "Kurang";
-                    $hasil["kecukupan"][] = 1;
+                    $hasil[] = ["makanan" => $item[0],
+                                "keterangan" => "Kurang",
+                                "kecukupan" => 1,
+                                ];
                 }elseif($item[1] > $gelas){
-                    $hasil["makanan"][] = $item[0];
-                    $hasil["keterangan"][] = "Berlebihan";
-                    $hasil["kecukupan"][] = 3;
+                    $hasil[] = ["makanan" => $item[0],
+                                "keterangan" => "Berlebihan",
+                                "kecukupan" => 3,
+                                ];
                 }
                 $index++;
                 continue;
             }elseif(in_array($item[1], range($sdm1,$sdm2))){
-                $hasil["makanan"][] = $item[0];
-                $hasil["keterangan"][] = "Cukup";
-                $hasil["kecukupan"][] = 2;
+                $hasil[] = ["makanan" => $item[0],
+                            "keterangan" => "Cukup",
+                            "kecukupan" => 2,
+                            ];
             }elseif($item[1] < $sdm1){
-                $hasil["makanan"][] = $item[0];
-                $hasil["keterangan"][] = "Kurang";
-                $hasil["kecukupan"][] = 2;
+                $hasil[] = ["makanan" => $item[0],
+                            "keterangan" => "Kurang",
+                            "kecukupan" => 1,
+                            ];
             }elseif($item[1] > $sdm2){
-                $hasil["makanan"][] = $item[0];
-                $hasil["keterangan"][] = "Berlebihan";
-                $hasil["kecukupan"][] = 3;
+                $hasil[] = ["makanan" => $item[0],
+                            "keterangan" => "Berlebihan",
+                            "kecukupan" => 3,
+                            ];
             }
             $index++;
         }
