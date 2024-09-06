@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Models\User;
 use App\Models\posyandu;
 use Illuminate\Http\Request;
-use App\Helpers\ResponseFormatter;
 use App\Models\jadwal_posyandu;
+use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class posyanduController extends Controller
@@ -189,6 +191,54 @@ class posyanduController extends Controller
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return ResponseFormatter::error(null, $e->getMessage(), 500);
+        }
+    }
+
+    public function saveSubs(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'subscription_id' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();;
+            return ResponseFormatter::error(null,$error[0],422);
+        };
+
+        try {
+            $users = User::find(Auth::user()->id);
+
+            $users->update([
+                'subscription_id' => $request->subscription_id,
+            ]);
+
+            return ResponseFormatter::success($users, "Data Jadwal Berhasil Dibuat!");
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
+        }
+    }
+
+    public function sendNotif(Request $request) {
+        $contents = $request->query('contents');
+        $subscriptionIds = $request->query('subscription_ids');
+        $url = $request->query('url');
+    
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Basic MzRkOTI0YWUtMWI5Yi00ZjRiLTlkZGMtNWViZmViNjUzODMw',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->post('https://onesignal.com/api/v1/notifications', [
+                'app_id' => '58a17682-ac07-4856-9282-cc77cc855460',
+                'include_player_ids' => explode(',', $subscriptionIds),
+                'contents' => ['en' => 'testtttt'],
+                'url' => $url,
+            ]);
+    
+            return $response->body();
+        } catch (\Exception $e) {
+            report($e);
+            return response()->json(['error' => 'Failed to send notification'], 500);
         }
     }
 }

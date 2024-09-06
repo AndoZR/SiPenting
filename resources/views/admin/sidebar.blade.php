@@ -17,7 +17,7 @@
       <p class="menu-label">Menu</p>
       <ul class="menu-list">
         <li class="--set-active-tables-html">
-          <a href="{{ route('artikel.index') }}">
+          <a href="{{ route('artikel.viewArtikel') }}">
             <span class="icon"><i class="mdi mdi-book-open-page-variant"></i></span>
             <span class="menu-item-label">Artikel</span>
           </a>

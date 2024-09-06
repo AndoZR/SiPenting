@@ -59,7 +59,7 @@ class AuthController extends Controller
         // Generate token jika username ditemukan
         // Biasanya menggunakan Laravel Passport atau Laravel Sanctum untuk token
         $token = auth()->login($user);
-    
+
         return $this->respondWithToken($token);
     }
     
@@ -247,5 +247,20 @@ class AuthController extends Controller
             return ResponseFormatter::error(null,$e->getMessage(),500);
         }
 
+    }
+
+    public function getIdSubs(Request $request){
+        try{
+            $user = Auth::user()->id;
+            $data = User::find($user);
+            $data->update([
+                'id_subs' => $request->id_subs
+            ]);
+
+            return ResponseFormatter::success($data->id_subs, "Berhasil Mendapatkan ID Subs OneSignal!");
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+            return ResponseFormatter::error(null, $e->getMessage(),500);
+        }
     }
 }

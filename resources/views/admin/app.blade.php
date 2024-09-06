@@ -1,10 +1,39 @@
 <!DOCTYPE html>
 <html lang="en" class="">
 <head>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title')</title>
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "58a17682-ac07-4856-9282-cc77cc855460",
+      });
+      const subscription = await OneSignal.User.PushSubscription.id;
+      
+      if (subscription) {
+        console.log(subscription);
+        
+        // Send the subscription ID to your Laravel backend
+        fetch('/save-subscription-id', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          },
+          body: JSON.stringify({ subscription_id: subscription }),
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+      }
+    });
+  </script>
 
   <!-- Tailwind is included -->
   <link rel="stylesheet" href="{{ asset('src/css/main.css?v=1652870200386') }}">
@@ -63,6 +92,5 @@ padding-top: 0px;
 
 <!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
 <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
-
 </body>
 </html>

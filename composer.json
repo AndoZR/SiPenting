@@ -4,13 +4,20 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
+    "repositories": [
+        {
+        "type": "vcs",
+        "url": "https://github.com/OneSignal/onesignal-php-api.git"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "league/csv": "^9.16",
-        "php-open-source-saver/jwt-auth": "^2.3"
+        "php-open-source-saver/jwt-auth": "^2.3",
+        "onesignal/onesignal-php-api": "*@dev"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

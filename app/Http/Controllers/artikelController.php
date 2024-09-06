@@ -14,7 +14,24 @@ use Carbon\Carbon;
 
 class artikelController extends Controller
 {
-    public function index(Request $request) {
+    public function index() {
+        try {
+            $dataArtikel = artikel::get();
+    
+            $dataArtikel->transform(function($artikel) { 
+                // Format created_at ke format 'Hari, tanggal-nama bulan-yyyy'
+                $artikel->formatted_created_at = Carbon::parse($artikel->created_at)->translatedFormat('l, d F Y');
+                return $artikel;
+            });
+    
+            return ResponseFormatter::success($dataArtikel, 'Berhasil Mendapatkan Data Artikel!');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+        }
+    }    
+
+    public function viewArtikel(Request $request) {
         if($request->ajax()) {
             try{
                 $dataArtikel = artikel::get();

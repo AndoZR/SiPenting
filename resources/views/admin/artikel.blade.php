@@ -117,7 +117,7 @@
 
         var idArtikel;
         let url;
-        let urlTest = '{{ route('artikel.index') }}';
+        let urlTest = '{{ route('artikel.viewArtikel') }}';
 
         let tableArtikel = $('#table-artikel').DataTable({
             paging: true,
@@ -220,7 +220,7 @@
             event.preventDefault(); // Prevent default link behavior
 
             var fileName = $(this).data('artikel'); // Get the filename from data attribute
-            var fileUrl = "{{ asset('storage/artikel') }}/" + fileName; // Create the file URL
+            var fileUrl = "{{ url('/storage/artikel') }}/" + fileName; // Create the file URL
 
             // Update modal content with the image
             $('#modal-image').find('.modal-title').text('Image Preview'); // Set modal title

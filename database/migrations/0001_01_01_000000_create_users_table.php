@@ -38,6 +38,7 @@ return new class extends Migration
             $table->char('id_villages',10)->nullable();
             $table->foreign('id_villages')->references('id')->on('villages')->onDelete('cascade');
             $table->string('password');
+            $table->string('id_subs')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
