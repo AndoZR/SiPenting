@@ -18,6 +18,7 @@ class artikelSeeder extends Seeder
                 'judul' => 'Judul A',
                 'deskripsi' => 'Ini adalah deskripsi dari Judul A',
                 'gambar' => "gambar1",
+                'url_video' => "https://www.youtube.com/watch?v=RH9zOxSGoHg",
                 'created_at' => date('Y-m-d'),
             ],
         ]);
@@ -26,6 +27,7 @@ class artikelSeeder extends Seeder
                 'judul' => 'Judul B',
                 'deskripsi' => 'Ini adalah deskripsi dari Judul B',
                 'gambar' => "gambar2",
+                'url_video' => "https://www.youtube.com/watch?v=RH9zOxSGoHg",
                 'created_at' => date('Y-m-d'),
             ],
         ]);
@@ -34,6 +36,7 @@ class artikelSeeder extends Seeder
                 'judul' => 'Judul C',
                 'deskripsi' => 'Ini adalah deskripsi dari Judul C',
                 'gambar' => "gambar3",
+                'url_video' => "",
                 'created_at' => date('Y-m-d'),
             ],
         ]);

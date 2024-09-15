@@ -56,6 +56,7 @@ class artikelController extends Controller
             'judul' => 'required|string|max:100',
             'deskripsi' => 'required|string',
             'gambar' => 'required|max:3000|mimes:png,jpg',
+            'video' => 'nullable|string|url',
         ]);
 
         if ($validator->fails()) {
@@ -72,6 +73,7 @@ class artikelController extends Controller
                 'judul' => $request->judul,
                 'deskripsi' => $request->deskripsi,
                 'gambar' => $nameGambar,
+                'url_video' => $request->video,
             ]);
 
             return ResponseFormatter::success($data, "Data Artikel Berhasil Dibuat!");
@@ -86,6 +88,7 @@ class artikelController extends Controller
             'judul' => 'string|max:100',
             'deskripsi' => 'string',
             'gambar' => 'max:3000|mimes:png,jpg',
+            'video' => 'nullable|string|url',
         ]);
 
         if ($validator->fails()) {
@@ -94,7 +97,11 @@ class artikelController extends Controller
 
         try {
             $data = artikel::find($id);
-            $updateData = $request->only(['judul', 'deskripsi']);
+            $updateData = [
+                'judul' => $request->judul, 
+                'deskripsi' => $request->deskripsi,
+                'url_video' =>$request->video
+            ];
 
             if ($request->file('gambar')) {
                 // Hapus gambar lama jika ada
@@ -123,6 +130,9 @@ class artikelController extends Controller
     public function deleteArtikel($id){
         try{
             $data = artikel::find($id);
+            if ($data->gambar) {
+                Storage::delete('public/artikel/' . $data->gambar);
+            }
             $data->delete();
             return ResponseFormatter::success("Data Artikel Berhasil Dihapus!");
         } catch (Exception $e) {

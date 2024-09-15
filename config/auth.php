@@ -36,9 +36,25 @@ return [
     */
 
     'guards' => [
-        'web' => [
+        // 'web' => [
+        //     'driver' => 'session',
+        //     'provider' => 'users',
+        // ],
+        'bapeda' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'bapeda',
+        ],
+        'dinkes' => [
+            'driver' => 'session',
+            'provider' => 'dinkes',
+        ],
+        'puskesmas' => [
+            'driver' => 'session',
+            'provider' => 'puskesmas',
+        ],
+        'bidan' => [
+            'driver' => 'session',
+            'provider' => 'bidan',
         ],
 
         'api' => [
@@ -68,6 +84,22 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+        'bapeda' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\akun_bapeda::class),
+        ],
+        'dinkes' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\akun_dinkes::class),
+        ],
+        'puskesmas' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\akun_puskesmas::class),
+        ],
+        'bidan' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\akun_bidan::class),
         ],
 
         // 'users' => [
@@ -99,7 +131,7 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
+            'expire' => 720,
             'throttle' => 60,
         ],
     ],

@@ -9,10 +9,12 @@ use App\Http\Controllers\posyanduController;
 use App\Http\Controllers\kalkulatorGiziController;
 use App\Http\Controllers\kalkulatorStuntingController;
 
-Route::post('login', [AuthController::class, 'login'])->name('login');
-Route::post('register', [AuthController::class, 'register']);
-Route::get('kecamatan', [AuthController::class, 'getKecamatan']);
-Route::post('desa', [AuthController::class, 'getDesa']);
+Route::middleware(['guest'])->group(function () {
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('register', [AuthController::class, 'register']);
+    Route::get('kecamatan', [AuthController::class, 'getKecamatan']);
+    Route::post('desa', [AuthController::class, 'getDesa']);
+});
 
 Route::middleware(['auth:api', 'role:1,2'])->group(function () {
     Route::get('getuser', [AuthController::class, 'getUser']);
@@ -26,16 +28,20 @@ Route::middleware(['auth:api', 'role:1,2'])->group(function () {
     });
 });
 
+
+
 Route::middleware(['auth:api', 'role:1'])->group(function () {
     Route::group(['prefix'=>'kalkulatorGizi'], function () {
         Route::get('/', [kalkulatorGiziController::class, 'getMakanan'])->name('getMakanan');
         Route::post('/cekGizi', [kalkulatorGiziController::class, 'cekGizi'])->name('cekGizi');
     });
 
+
     Route::group(['prefix'=>'kalkulatorStunting'], function () {
         Route::post('/cekStuntingIbu', [kalkulatorStuntingController::class, 'cekStuntingIbu'])->name('cekStuntingIbu');
         Route::post('/cekStuntingAnak', [kalkulatorStuntingController::class, 'cekStuntingAnak'])->name('cekStuntingAnak');
     });
+
 
     Route::group(['prefix'=>'bayi'], function () {
         Route::get('/', [bayiController::class, 'index'])->name('bayi');
@@ -44,9 +50,15 @@ Route::middleware(['auth:api', 'role:1'])->group(function () {
         Route::post('/deleteBayi', [bayiController::class, 'deleteBayi'])->name('deleteBayi');
     });
 
+
     Route::group(['prefix'=>'artikel'], function () {
         Route::get('/',[artikelController::class, 'index'])->name('index');
     });
+
+
+    // PUSH NOTIFICATION
+    // Route::post('/send-notification', [posyanduController::class, 'sendNotif']);
+    Route::get('/send-notification', [AuthController::class, 'sendNotif']);
 });
 
 Route::middleware(['auth:api', 'role:2'])->group(function () {

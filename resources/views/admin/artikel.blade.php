@@ -1,21 +1,35 @@
 @extends('admin.app')
 @section('title', 'Artikel')
-@section('sub-title', 'Artikel')
+@section('sub-title', 'Dashboard / Artikel')
+
+@push('css')
+    {{-- datatable --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.1/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="{{ asset('src/compiled/css/app.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('src/compiled/css/app-dark.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('src/compiled/css/iconly.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('src/compiled/css/table-datatable.css') }}">
+@endpush
 
 @section('content')
-<section class="section">
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive ">
-                <table id="table-artikel" class="table table-striped">
+<main>
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                DataTable Example
+            </div>
+            <div class="card-body">
+                <table class="table table-striped" id="table-artikel">
                     <thead>
                         <tr>
-                            <th scope="col">No.</th>
-                            <th scope="col">Judul</th>
-                            <th scope="col">Deskripsi</th>
-                            <th scope="col">Gambar</th>
-                            <th scope="col">Dibuat</th>
-                            <th scope="col">Aksi</th>
+                            <th>No.</th>
+                            <th>Judul</th>
+                            <th>Deskripsi</th>
+                            <th>Gambar</th>
+                            <th>Video</th>
+                            <th>Dibuat</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,7 +38,7 @@
             </div>
         </div>
     </div>
-</section>
+</main>
 
 <!-- Modal Create Artikel -->
 <div class="modal fade" id="modal-create-artikel" tabindex="-1" role="dialog" aria-labelledby="modalCreate" aria-hidden="true">
@@ -66,13 +80,22 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="video">Url Video (Opsional)</label>
+                  <input type="text" class="form-control" name="video" id="video" placeholder="Isi Url" autofocus autocomplete="off">
+                  <div class="invalid-feedback video_error"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn" data-bs-dismiss="modal">
                   <i class="bx bx-x d-block d-sm-none"></i>
                   <span class="d-none d-sm-block">Batal</span>
               </button>
-              <button type="submit" class="button ms-1">
+              <button type="submit" class="btn btn-primary ms-1">
                   <i class="bx bx-check d-block d-sm-none"></i>
                   <span class="d-none d-sm-block">Simpan</span>
               </button>
@@ -107,6 +130,14 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('src/admin/js/datatables-simple-demo.js') }}"></script>
+
+{{-- <script src="{{ asset('src/compiled/js/app.js') }}"></script> --}}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.1/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.0/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.dataTables.js"></script>
+
 <script>
     $(document).ready(function () {
         $('.modal').on('hidden.bs.modal', function(e) {
@@ -136,7 +167,7 @@
                     buttons: [
                         {
                             text: '<i class="fas fa-plus mr-2"></i> Tambah Data',
-                            className: 'button light btn-tambah mb-3',
+                            className: 'btn btn-primary mb-2 mt-2',
                             action: function(e, dt, node, config) {
                                 $('#modal-create-artikel').modal('show');
                             }
@@ -177,14 +208,26 @@
                         if (data) {
                             // Assuming 'data' contains the image filename
                             let imageUrl = `/storage/artikel/${data}`;
-                            return `<a title="${data}" href="#" class="button btn-artikel" data-artikel="${ data }">Lihat</a>`;
+                            return `<a title="${data}" href="#" class="btn btn-info btn-artikel" data-artikel="${ data }">Lihat</a>`;
                         } else {
                             return 'No Image';  // Placeholder text if no image is available
                         }
                     }
                 },
                 {
-                    targets: 4,
+                  targets: 4,
+                  data: 'url_video',
+                  className: 'text-center align-middle',
+                  render: function(data, type, row, meta) {
+                        if (data) {
+                            return `<a title="${data}" href="${data}" target="_blank" class="btn btn-info">Lihat</a>`;
+                        } else {
+                            return 'No Video';  // Placeholder text if no image is available
+                        }
+                    }
+                },
+                {
+                    targets: 5,
                     data: 'created_at',
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
@@ -199,15 +242,14 @@
                     }
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     data: null,
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
                         url = "";
                         url = url.replace(':id', row.id);
-                        $button = `<button class="button btn-sm btn-edit" title="Ubah">Ubah</button>
-                        <br><button class="button btn-sm btn-delete" title="Hapus">Hapus</button><br>`;
-
+                        $button = `<button class="btn btn-warning btn-edit" title="Ubah">Ubah</button>
+                        <br><button class="btn btn-danger btn-delete" title="Hapus">Hapus</button><br>`;
                         return $button;
                     }
                 },
@@ -258,6 +300,7 @@
                         text: response.meta.message,
                     });
                     tableArtikel.ajax.reload();
+                    idArtikel = undefined;
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
                     switch (xhr.status) {
@@ -295,6 +338,7 @@
             // set form action
             $('input[name="judul"]').val(data.judul);
             $('textarea[name="deskripsi"]').val(data.deskripsi);
+            $('input[name="video"]').val(data.url_video);
 
             // show modal
             $('#modal-create-artikel').modal('show');

@@ -14,6 +14,7 @@ class artikel extends Model
     protected $fillable = [
       'judul',
       'deskripsi',
-      'gambar'  
+      'gambar',  
+      'url_video'  
     ];
 }

@@ -49,5 +49,46 @@ class userSeeder extends Seeder
                 'created_at' => $nowDate,
             ],
         ]);
+
+
+        // bapeda
+        DB::table('akun_bapeda')->insert([
+            [
+                'username' => "bapeda_admin",
+                'name' => "admin",
+                'password' => hash::make('bapeda_admin'),
+                'created_at' => $nowDate,
+            ],
+        ]);
+
+        // Dinkes
+        DB::table('akun_dinkes')->insert([
+            [
+                'username' => "dinkes_admin",
+                'name' => "admin",
+                'password' => hash::make('dinkes_admin'),
+                'created_at' => $nowDate,
+            ],
+        ]);
+
+        // Puskesmas
+        DB::table('akun_puskesmas')->insert([
+            [
+                'username' => "puskesmas_admin",
+                'name' => "admin",
+                'password' => hash::make('puskesmas_admin'),
+                'created_at' => $nowDate,
+            ],
+        ]);
+
+        // bidan
+        DB::table('akun_bidan')->insert([
+            [
+                'username' => "bidan_admin",
+                'name' => "admin",
+                'password' => hash::make('bidan_admin'),
+                'created_at' => $nowDate,
+            ],
+        ]);
     }
 }

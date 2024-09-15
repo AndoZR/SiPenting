@@ -59,11 +59,77 @@ class kalkulatorGiziController extends Controller
 
     private function cekMakan($dataMakanan,$umurBayi,$collectMakanan){
         if ($umurBayi >= 6 && $umurBayi <= 8){
-            $cekSdm = $this->cekSdm($dataMakanan,8,9,$collectMakanan,3); // cek sdm (data makanan dan sdm yang masuk dari kalkulator, batas sdm bawah, batas sdm atas, data makanan idnya aja)
+            $sdm1 = 2;
+            $sdm2 = 5;
+            $gelas = 3;
+
+            $cekSdm = $this->cekSdm($dataMakanan,$sdm1,$sdm2,$collectMakanan,3); // cek sdm (data makanan dan sdm yang masuk dari kalkulator, batas sdm bawah, batas sdm atas, data makanan idnya aja)
+            
+            // aku ingin memberi rekomendasi setiap umur pada "keterangan"
+            foreach ($cekSdm as $key => $value) {
+                if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
+                    if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran minum $gelas gelas! Segera konsultasi!";
+                    }else{
+                        $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
+                    }
+                }else{
+                    if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran makan $sdm1 hingga $sdm2 sendok makan! Segera konsultasi!";
+                    }else{
+                        $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
+                    }
+                }
+            }
+
         }elseif($umurBayi >= 9 && $umurBayi <= 11){
-            $cekSdm = $this->cekSdm($dataMakanan,13,14,$collectMakanan,4);
+            $sdm1 = 8;
+            $sdm2 = 8;
+            $gelas = 4;
+
+            $cekSdm = $this->cekSdm($dataMakanan,$sdm1,$sdm2,$collectMakanan,4);
+            
+            // aku ingin memberi rekomendasi setiap umur pada "keterangan"
+            foreach ($cekSdm as $key => $value) {
+                if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
+                    if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran minum $gelas gelas! Segera konsultasi!";
+                    }else{
+                        $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
+                    }
+                }else{
+                    if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran makan $sdm1 sendok makan! Segera konsultasi!";
+                    }else{
+                        $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
+                    }
+                }
+            }
+
         }elseif($umurBayi >= 12 && $umurBayi <= 23){
-            $cekSdm = $this->cekSdm($dataMakanan,16,17,$collectMakanan,5);
+            $sdm1 = 10;
+            $sdm2 = 10;
+            $gelas = 5;
+
+            $cekSdm = $this->cekSdm($dataMakanan,$sdm1,$sdm2,$collectMakanan,5);
+        
+            // aku ingin memberi rekomendasi setiap umur pada "keterangan"
+            foreach ($cekSdm as $key => $value) {
+                if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
+                    if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran minum $gelas gelas! Segera konsultasi!";
+                    }else{
+                        $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
+                    }
+                }else{
+                    if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran makan $sdm1 sendok makan! Segera konsultasi!";
+                    }else{
+                        $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
+                    }
+                }
+            }
+
         }else{
             return "Data umur balita haraus 6 hingga 23 bulan!";
         }

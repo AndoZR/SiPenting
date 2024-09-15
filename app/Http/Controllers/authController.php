@@ -6,12 +6,19 @@ use Exception;
 use App\Models\User;
 use App\Models\villages;
 use App\Models\districts;
+use App\Models\akun_bidan;
+use App\Models\akun_bapeda;
+use App\Models\akun_dinkes;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\akun_puskesmas;
 use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -108,7 +115,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => auth()->factory()->getTTL() * 720,
             'role' => auth()->user()->role
         ]);
     }
@@ -193,38 +200,6 @@ class AuthController extends Controller
         }
     }
 
-    public function viewRegisterBidan() {
-        return view('registerBidan');
-    }
-
-    public function viewLogin() {
-        return view('registerBidan');
-    }
-    
-    public function registerBidan(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'nik' => 'required|unique:users,nik',
-        ]);
-    
-        if ($validator->fails()) {
-            return redirect()->route('viewRegisterBidan')->with('error', $validator->errors());
-        };
-
-        try {
-            $dataUser = User::create([
-                'username' => $request->nik,
-                'nik' => $request->nik,
-                'password' => Hash::make($request->nik),
-                'role' => 2,
-            ]);
-
-            return redirect()->route('viewRegisterBidan')->with('success', 'Data User Berhasil Dibuat!');
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return redirect()->route('viewRegisterBidan')->with('error', $e->getMessage());
-        }
-    }
-
     public function getKecamatan() {
         $data = districts::where('regency_id',3511)->get();
 
@@ -263,4 +238,129 @@ class AuthController extends Controller
             return ResponseFormatter::error(null, $e->getMessage(),500);
         }
     }
+
+    public function sendNotif(){
+        // dd($idsubs);
+        $idsubs = Auth::user()->id_subs;
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json; charset=utf-8',
+            'Authorization' => 'Basic ZGZlNDhlMzMtZDdkZC00NmI3LWE5YzQtODg3MGNkODg5M2I4'
+        ])->post('https://api.onesignal.com/notifications', [
+            'app_id' => '9a7d21da-61b0-422e-b238-eb8cdc24cead',
+            'name' => ['en' => 'My notification Name'],
+            'contents' => ['en' => 'testing on notification from server online success yuhuuu'],
+            'headings' => ['en' => 'English Title'],
+            'include_subscription_ids' => [
+                '5a2419c2-03c3-4dac-9060-132986ab3818',
+                // 'SUBSCRIPTION_ID_2',
+                // 'SUBSCRIPTION_ID_3',
+            ],
+        ]);
+
+        // Cek respons dari request
+        if ($response->successful()) {
+            return ResponseFormatter::success( $response->json(), 'Berhasil Mengirim Notif!');
+            // return $response->json(); // Mengembalikan data respons sebagai array JSON
+        } else {
+            return $response->body(); // Jika ada error
+        }
+    }
+
+
+
+    // SISI WEBSITE
+    public function registerBidan(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'nik' => 'required|unique:users,nik',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->route('viewRegisterBidan')->with('error', $validator->errors());
+        };
+
+        try {
+            $dataUser = User::create([
+                'username' => $request->nik,
+                'nik' => $request->nik,
+                'password' => Hash::make($request->nik),
+                'role' => 2,
+            ]);
+
+            return redirect()->route('viewRegisterBidan')->with('success', 'Data User Berhasil Dibuat!');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->route('viewRegisterBidan')->with('error', $e->getMessage());
+        }
+    }
+
+    public function viewRegisterBidan() {
+        return view('registerBidan');
+    }
+
+    public function viewLogin() {
+        return view('registerBidan');
+    }
+
+    public function loginWeb() {
+        if (Auth::check()) {
+            // Jika sudah login, arahkan ke halaman home
+            return redirect()->route('home');
+        }
+        return view('login');
+    }
+
+    public function webLoginProcess(Request $request) {
+        // Validasi input hanya untuk username
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string',
+        ]);
+    
+        if ($validator->fails()) {
+            // Kirimkan pesan error pertama
+            return redirect()->route('login-web')->with('error', $validator->errors()->first());
+        }
+    
+        try {
+            // Mencari user berdasarkan username
+            $username = $request->input('username');
+
+            // Memeriksa apakah username dimulai dengan 'bapeda_'
+            if (Str::startsWith($username, 'bapeda_')) {
+                $user = akun_bapeda::where('username', $username)->first();
+                Auth::guard('bapeda')->login($user);
+            } elseif (Str::startsWith($username, 'dinkes_')) {
+                $user = akun_dinkes::where('username', $username)->first();
+                Auth::guard('dinkes')->login($user);
+            } elseif (Str::startsWith($username, 'puskemas_')) {
+                $user = akun_puskesmas::where('username', $username)->first();
+                Auth::guard('puskemas')->login($user);
+            } elseif (Str::startsWith($username, 'bidan_')) {
+                $user = akun_bidan::where('username', $username)->first();
+                Auth::guard('bidan')->login($user);
+            } else {
+                return redirect()->route('login-web')->with('error', 'Pengguna tidak valid.');
+            }
+
+            // Regenerasi session untuk mencegah session fixation attacks
+            $request->session()->regenerate();
+
+            // Arahkan ke halaman setelah login
+            return redirect('home');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->route('login-web')->with('error', $e->getMessage());
+        }
+    }    
+
+    public function logoutWeb(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+     
+        $request->session()->regenerateToken();
+    
+        // Arahkan ke halaman login
+        return redirect('/login');
+    }    
 }

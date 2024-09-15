@@ -139,20 +139,34 @@ class kalkulatorStuntingController extends Controller
                 }
             }
 
+            $hasil = [];
+
             if($tinggiBadan < $heightStandardArray['Panjang Badan (cm) -3 SD']){
-                return ResponseFormatter::success(1,'Data telah diproses!');
+                $hasil["status"] = 1;
+                $hasil["rekomendasi"] = "Segera periksa ke puskesmas, pastikan konsumsi protein hewani!";
+                return ResponseFormatter::success($hasil,'Data telah diproses!');
             }elseif($tinggiBadan > $heightStandardArray['Panjang Badan (cm) +3 SD']){
-                return ResponseFormatter::success(4,'Data telah diproses!');
+                $hasil["status"] = 4;
+                $hasil["rekomendasi"] = "Pastikan carta mengukur anak Anda benar!";
+                return ResponseFormatter::success($hasil,'Data telah diproses!');
             };
 
             if($columnName == 'Panjang Badan (cm) -3 SD'){
-                return ResponseFormatter::success(1,'Data telah diproses!');
+                $hasil["status"] = 1;
+                $hasil["rekomendasi"] = "Segera periksa ke puskesmas, pastikan konsumsi protein hewani!";
+                return ResponseFormatter::success($hasil,'Data telah diproses!');
             }elseif($columnName == 'Panjang Badan (cm) -2 SD' || $columnName == 'Panjang Badan (cm) -1 SD'){
-                return ResponseFormatter::success(2,'Data telah diproses!');
+                $hasil["status"] = 2;
+                $hasil["rekomendasi"] = "Segera periksa ke puskesmas, pastikan konsumsi protein hewani!";
+                return ResponseFormatter::success($hasil,'Data telah diproses!');
             }elseif($columnName == 'Panjang Badan (cm) Median' || $columnName == 'Panjang Badan (cm) +1 SD' || $columnName == 'Panjang Badan (cm) +1 SD'){
-                return ResponseFormatter::success(3,'Data telah diproses!');
+                $hasil["status"] = 3;
+                $hasil["rekomendasi"] = "Pertahankan!";
+                return ResponseFormatter::success($hasil,'Data telah diproses!');
             }elseif($columnName == 'Panjang Badan (cm) +3 SD'){
-                return ResponseFormatter::success(4,'Data telah diproses!');
+                $hasil["status"] = 4;
+                $hasil["rekomendasi"] = "Pastikan carta mengukur anak Anda benar!";
+                return ResponseFormatter::success($hasil,'Data telah diproses!');
             }
         }catch(Exception $e){
             Log::error($e->getMessage());
