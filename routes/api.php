@@ -10,7 +10,7 @@ use App\Http\Controllers\kalkulatorGiziController;
 use App\Http\Controllers\kalkulatorStuntingController;
 
 Route::middleware(['guest'])->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::get('kecamatan', [AuthController::class, 'getKecamatan']);
     Route::post('desa', [AuthController::class, 'getDesa']);

@@ -28,7 +28,7 @@ Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {
     Route::get('/', function() {
         return view("login");
     });
-    Route::get('/login', [AuthController::class, 'loginWeb'])->name('login-web');
+    Route::get('/login', [AuthController::class, 'loginWeb'])->name('login');
     Route::post('/login', [AuthController::class, 'webLoginProcess'])->name('login-web-process');
 });
 
