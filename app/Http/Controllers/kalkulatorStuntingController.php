@@ -37,15 +37,7 @@ class kalkulatorStuntingController extends Controller
         $user_id = Auth::user()->id;
         
         // Menyimpan berat badan saat ini ke database
-        try {
-            $berat = berat_badan::create([
-                'bbNow' => $bbNow,
-                'id_users' => $user_id
-            ]);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return ResponseFormatter::error(null, $e->getMessage(), 500);
-        }
+        $this->simpanBeratBadan($bbNow, $user_id);
 
         // Define the threshold values
         $lilaThreshold = 23.5;
@@ -55,11 +47,12 @@ class kalkulatorStuntingController extends Controller
 
         // Check LILA
         if ($lila < $lilaThreshold){
-            $issues["lila"] = "Lingkar lengan atas terlalu rendah (LILA: $lila cm, harus minimal $lilaThreshold cm)";
+            $issues["lila"] = "Lingkar lengan atas terlalu rendah! (LILA: $lila cm, harus minimal $lilaThreshold cm)";
+        }else{
+            $issues["lila"] = "Pertahankan! (LILA: $lila cm, harus minimal $lilaThreshold cm)";
         }
 
         // Check HB
-        // dd($hb);
         if ($hb == 1){
             $issues["hb"] = "Hemoglobin normal";
         }
@@ -172,6 +165,41 @@ class kalkulatorStuntingController extends Controller
             Log::error($e->getMessage());
             return ResponseFormatter::error(null, $e->getMessage(), 500);
         };
+    }
+
+
+
+
+    protected function simpanBeratBadan($bbNow,$user_id)
+    {
+        // Ambil bulan dan tahun saat ini menggunakan Carbon
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+
+        try {
+            // Cek apakah user sudah memiliki catatan di bulan dan tahun ini
+            $berat = berat_badan::where('id_users', $user_id)
+                ->whereMonth('created_at', $currentMonth)
+                ->whereYear('created_at', $currentYear)
+                ->first();
+
+            if ($berat) {
+                // Jika sudah ada, lakukan update
+                $berat->update([
+                    'bbNow' => $bbNow,
+                ]);
+            } else {
+                // Jika belum ada, buat data baru
+                $berat = berat_badan::create([
+                    'bbNow' => $bbNow,
+                    'id_users' => $user_id,
+                ]);
+            }
+        } catch (Exception $e) {
+            // Tangkap error jika ada
+            Log::error($e->getMessage());
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
+        }
     }
 }
  

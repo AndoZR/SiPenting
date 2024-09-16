@@ -24,6 +24,7 @@ Route::get('/storage/artikel/{filename}', function ($filename) {
 });
 
 
+
 Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {
     Route::get('/', function() {
         return view("login");
@@ -38,12 +39,16 @@ Route::middleware(['auth:bidan,puskesmas,bapeda,dinkes','check'])->group(functio
     Route::get('/home', [dashboardController::class, 'index'])->name('home');
 
     Route::group(['prefix' => 'artikel', 'as' => 'artikel.'], function () {
-        Route::get('/viewArtikel', [artikelController::class, 'viewArtikel'])->name('viewArtikel');
+        Route::get('/', [artikelController::class, 'viewArtikel'])->name('viewArtikel');
         Route::post('/storeArtikel', [artikelController::class, 'storeArtikel'])->name('storeArtikel');
         Route::post('/updateArtikel/{id}', [artikelController::class, 'updateArtikel'])->name('updateArtikel');
         Route::get('/deleteArtikel/{id}', [artikelController::class, 'deleteArtikel'])->name('deleteArtikel');
     });
 
+    Route::group(['prefix' => 'ibu-hamil', 'as' => 'ibu-hamil.'], function () {
+        Route::get('/daftar', [dashboardController::class, 'daftar'])->name('ibu-hamil-daftar');
+        Route::get('/graph/{id}', [dashboardController::class, 'graph'])->name('ibu-hamil-graph');
+    });
 
     Route::get('/logout', [AuthController::class, 'logoutWeb'])->name('logout-web');
 });
@@ -54,5 +59,7 @@ Route::group(['prefix' => 'bidan'], function () {
     Route::get('/', [AuthController::class, 'viewRegisterBidan'])->name('viewRegisterBidan');
     Route::post('/register', [AuthController::class, 'registerBidan'])->name('registerBidan');
 });
+
+
 
 Route::post('/save-subscription-id', [posyanduController::class, 'saveSubs']);

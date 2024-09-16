@@ -17,7 +17,7 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                DataTable Example
+                DataTable
             </div>
             <div class="card-body">
                 <table class="table table-striped" id="table-artikel">
@@ -246,8 +246,6 @@
                     data: null,
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
-                        url = "";
-                        url = url.replace(':id', row.id);
                         $button = `<button class="btn btn-warning btn-edit" title="Ubah">Ubah</button>
                         <br><button class="btn btn-danger btn-delete" title="Hapus">Hapus</button><br>`;
                         return $button;

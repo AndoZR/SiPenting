@@ -6,6 +6,10 @@
               <a href="#">Privacy Policy</a>
               &middot;
               <a href="#">Terms &amp; Conditions</a>
+              &middot;
+              <a target="_blank" href="https://wa.me/6281216532315">Kontak Pengembang</a>
+              &middot;
+              <a href="{{ asset('src/SiPenting_Fixed (8).apk') }}" download>APK</a>
           </div>
       </div>
   </div>

@@ -18,4 +18,11 @@ class villages extends Model
         'district_id',
         'name',
     ];
+
+
+    // Relasi Village ke User
+    public function users()
+    {
+        return $this->hasMany(User::class, 'id_villages');  // 'village_id' adalah foreign key di tabel users
+    }
 }

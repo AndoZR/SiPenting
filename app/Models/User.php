@@ -77,4 +77,16 @@ class User extends Authenticatable implements JWTSubject
     //         'password' => 'hashed',
     //     ];
     // }
+
+    // Relasi User ke Village
+    public function villages()
+    {
+        return $this->belongsTo(villages::class, 'id_villages');  // 'village_id' adalah foreign key di tabel users
+    }
+
+    // Relasi User ke bb
+    public function berat_badan()
+    {
+        return $this->hasMany(berat_badan::class, 'id_users');  // 'id_users' adalah foreign key di tabel berat_badan
+    }
 }

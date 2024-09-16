@@ -13,6 +13,15 @@ class berat_badan extends Model
 
     protected $fillable = [
         'bbNow',
-        'id_users'
+        'id_users',
+        'created_at',
+        'updated_at'
     ];
+
+
+    // Relasi bb ke User
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'id_users');
+    }
 }

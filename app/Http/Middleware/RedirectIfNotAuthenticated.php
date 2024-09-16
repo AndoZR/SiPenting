@@ -12,7 +12,7 @@ class RedirectIfNotAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (!Auth::check()) {
-            return redirect()->route('login-web');
+            return redirect()->route('login');
         }        
 
         return $next($request);
