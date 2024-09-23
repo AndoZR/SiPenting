@@ -15,7 +15,8 @@ class dataStunt extends Seeder
      */
     public function run(): void
     {
-        $csvFile = Storage::path('public\stunt.csv');
+        // $csvFile = Storage::path('public\stunt.csv');
+        $csvFile = storage_path('app/public/stunt.csv');
         $file = fopen($csvFile, "r");
 
         while (($data = fgetcsv($file, 1000, ",")) !== FALSE) {

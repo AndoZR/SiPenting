@@ -21,14 +21,15 @@ class userSeeder extends Seeder
         for($i = 0; $i <= 3; $i++) {
             DB::table('users')->insert([
                 [
-                    'nik' => 3509200904020000 + $i,
-                    'username' => 3509200904020000 + $i,
+                    'nik' => str_pad((3509200904020000 + $i), 16, '0', STR_PAD_LEFT), // Pastikan panjang 16 karakter
+                    'username' => str_pad((3509200904020000 + $i), 16, '0', STR_PAD_LEFT),
                     'tanggalLahir' => "1995-01-01",
                     'namaIbu' => "User" . $i,
                     'bbPraHamil' => 50.5,
                     'tinggiBadan' => 160,
                     'role' => 1,
                     'id_villages' => 1101010001,
+                    'id_subs' => "5a2419c2-03c3-4dac-9060-132986ab3818",
                     'password' => hash::make(3509200904020000 + $i),
                     'created_at' => $nowDate,
                 ],
@@ -37,8 +38,8 @@ class userSeeder extends Seeder
 
         DB::table('users')->insert([
             [
-                'nik' => 3509200904020021,
-                'username' => 3509200904020021,
+                'nik' => str_pad((3509200904020021), 16, '0', STR_PAD_LEFT),
+                'username' => str_pad((3509200904020021), 16, '0', STR_PAD_LEFT),
                 'tanggalLahir' => "2000-01-01",
                 'namaIbu' => null,
                 'bbPraHamil' => null,

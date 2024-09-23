@@ -23,6 +23,9 @@ Route::get('/storage/artikel/{filename}', function ($filename) {
     return $response;
 });
 
+Route::get('/download/sipenting', function() {
+    return view("downloadAPK");
+});
 
 
 Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {

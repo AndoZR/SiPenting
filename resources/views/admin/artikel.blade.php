@@ -144,6 +144,7 @@
             $('form').trigger('reset');
             $('*').removeClass('is-invalid');
             $('.custom-file-label').html('Pilih file...');
+            idArtikel = undefined;
         });
 
         var idArtikel;
@@ -298,7 +299,6 @@
                         text: response.meta.message,
                     });
                     tableArtikel.ajax.reload();
-                    idArtikel = undefined;
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
                     switch (xhr.status) {

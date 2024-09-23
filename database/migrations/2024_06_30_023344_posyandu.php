@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->text('lokasi');
-            $table->string('lat',50);
-            $table->string('lng',50);
+            $table->string('lat',50)->nullable();
+            $table->string('lng',50)->nullable();
             $table->string('kontak');
             $table->unsignedBigInteger('id_users');
             $table->foreign('id_users')->references('id')->on('users')->onDelete('cascade');
+            $table->char('id_villages',10)->nullable();
+            $table->foreign('id_villages')->references('id')->on('villages')->onDelete('cascade');
         });
     }
 

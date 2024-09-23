@@ -19,6 +19,7 @@ class posyandu extends Model
         'lat',
         'lng',
         'kontak',
-        'id_users'
+        'id_users',
+        'id_villages'
     ];
 }

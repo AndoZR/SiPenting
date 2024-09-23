@@ -252,7 +252,7 @@ class AuthController extends Controller
             'contents' => ['en' => 'testing on notification from server online success yuhuuu'],
             'headings' => ['en' => 'English Title'],
             'include_subscription_ids' => [
-                '5a2419c2-03c3-4dac-9060-132986ab3818',
+                '860d76ea-153c-452c-96d5-7f6eab8dd67c',
                 // 'SUBSCRIPTION_ID_2',
                 // 'SUBSCRIPTION_ID_3',
             ],

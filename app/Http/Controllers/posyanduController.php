@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\posyandu;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use App\Jobs\SendPosyanduNotificationJob;
 
 class posyanduController extends Controller
 {
@@ -40,9 +42,9 @@ class posyanduController extends Controller
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string',
             'lokasi' => 'required|string',
-            'lat' => 'required|string',
-            'lng' => 'required|string',
-            'kontak' => 'required|int',
+            'lat' => 'string',
+            'lng' => 'string',
+            'kontak' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -73,6 +75,7 @@ class posyanduController extends Controller
             'lokasi' => 'string|nullable',
             'lat' => 'string|max:50|nullable',
             'lng' => 'string|max:50|nullable',
+            'kontak' => 'numeric|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -139,6 +142,24 @@ class posyanduController extends Controller
         };
 
         try {
+            // Mengambil semua nilai dari kolom 'idsubs'
+            $idsubsArray = User::pluck('id_subs')->toArray();
+
+            // Gabungkan tanggal dan waktu untuk mengatur delay notifikasi
+            $scheduleTime = Carbon::parse($request->tanggal . ' ' . $request->waktu);
+
+            $now = now();
+
+            if ($scheduleTime < $now) {
+                // Jadwal sudah lewat, mungkin abaikan atau tangani kasus ini
+                return ResponseFormatter::error(null, 'Waktu jadwal sudah lewat', 400);
+            }
+
+            // Kurangi 1 jam 30 menit dari waktu yang dijadwalkan
+            $notificationTime = $scheduleTime->subMinutes(90); // 1 jam 30 menit = 90 menit
+            
+            $delay = $now->diffInSeconds($notificationTime, false);
+
             $data = jadwal_posyandu::create([
                 'tanggal' => $request->tanggal,
                 'waktu' => $request->waktu,
@@ -146,6 +167,11 @@ class posyanduController extends Controller
                 'id_users' => Auth::user()->id,
                 'id_posyandu' => $request->idPosyandu,
             ]);
+
+
+            // Jadwalkan job jika delay positif
+            SendPosyanduNotificationJob::dispatch($idsubsArray,$data)->delay(abs($delay)); // Gunakan abs($delay) untuk delay positif
+            
 
             return ResponseFormatter::success($data, "Data Jadwal Berhasil Dibuat!");
         } catch (Exception $e) {
