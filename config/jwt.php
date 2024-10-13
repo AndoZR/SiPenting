@@ -89,7 +89,7 @@ return [
     |
     */
 
-    'ttl' => env('JWT_TTL', 60),
+    'ttl' => env('JWT_TTL', 720), // buat mengatur tenggat expires_in 720 berarti 720 menit
 
     /*
     |--------------------------------------------------------------------------

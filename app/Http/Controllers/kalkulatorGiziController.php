@@ -47,6 +47,7 @@ class kalkulatorGiziController extends Controller
                 $collectMakanan[] = $item[0];
                 $collectSdm[] = $item[1];
             }
+            // dd($collectMakanan);
     
             $hasil = $this->cekMakan($dataMakanan,$umurBayi,$collectMakanan);
     
@@ -69,13 +70,13 @@ class kalkulatorGiziController extends Controller
             foreach ($cekSdm as $key => $value) {
                 if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran minum $gelas gelas! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran minum ±$gelas gelas (800 mL)! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }else{
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran makan $sdm1 hingga $sdm2 sendok makan! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran makan $sdm1-$sdm2 sendok makan! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
@@ -83,8 +84,8 @@ class kalkulatorGiziController extends Controller
             }
 
         }elseif($umurBayi >= 9 && $umurBayi <= 11){
-            $sdm1 = 8;
-            $sdm2 = 8;
+            $sdm1 = 5;
+            $sdm2 = 7;
             $gelas = 4;
 
             $cekSdm = $this->cekSdm($dataMakanan,$sdm1,$sdm2,$collectMakanan,4);
@@ -93,21 +94,21 @@ class kalkulatorGiziController extends Controller
             foreach ($cekSdm as $key => $value) {
                 if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran minum $gelas gelas! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran minum ±3½ gelas (900 mL)! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }else{
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran makan $sdm1 sendok makan! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran makan $sdm1-$sdm2 sendok makan! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }
             }
 
-        }elseif($umurBayi >= 12 && $umurBayi <= 23){
-            $sdm1 = 10;
+        }elseif($umurBayi >= 12 && $umurBayi <= 59){
+            $sdm1 = 7;
             $sdm2 = 10;
             $gelas = 5;
 
@@ -117,13 +118,13 @@ class kalkulatorGiziController extends Controller
             foreach ($cekSdm as $key => $value) {
                 if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran minum $gelas gelas! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran minum ±$gelas gelas (1300 mL)! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }else{
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi th, disaran makan $sdm1 sendok makan! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran makan $sdm1-$sdm2 sendok makan! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
@@ -131,7 +132,7 @@ class kalkulatorGiziController extends Controller
             }
 
         }else{
-            return "Data umur balita haraus 6 hingga 23 bulan!";
+            return ["Data umur balita haraus 6 hingga 59 bulan!"];
         }
         return $cekSdm;
     }

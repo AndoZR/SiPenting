@@ -107,59 +107,33 @@ class kalkulatorStuntingController extends Controller
         try{
             $idBayi = $request->idBayi;
             $anak = bayi::where('id', $idBayi)->first();
-            $umur = round(Carbon::parse($anak->tanggalLahir)->diffInMonths(now()));        
-            $tinggiBadan = $request->tinggiBadan;
+            // $umur = round(Carbon::parse($anak->tanggalLahir)->diffInMonths(now())); // menggunakan kode ini akan mengonversi menjadi bulan dengan memandang tanggal hariannya
+            $umur = (now()->year - Carbon::parse($anak->tanggalLahir)->year) * 12 
+              + (now()->month - Carbon::parse($anak->tanggalLahir)->month); // menggunakan kode ini akan mengonversi menjadi bulan tanpa memandang tanggal hariannya
+            $tinggiBadan = floatval($request->tinggiBadan);
 
             $heightStandard = data_stunt::where('Umur (bulan)', (int)$umur)->first();
             // Menghapus kolom "id" dan "kelamin" dari array $heightStandard
             unset($heightStandard['id']);
             unset($heightStandard['kelamin']);
             unset($heightStandard['Umur (bulan)']);
-            
             $heightStandardArray = $heightStandard->toArray();
-
-            $toleransiPersentase = 2; // Toleransi dalam persentase, misalnya 5%
-
-            // Mencari nama kolom yang sesuai dengan input
-            $columnName = '';
-            foreach ($heightStandardArray as $key => $value) {
-
-                // Menghitung toleransi tinggi badan berdasarkan persentase
-                $valueFloat = (float) $value;
-                $toleransi = $valueFloat * ($toleransiPersentase / 100);
-            
-                // Memeriksa apakah tinggi badan input mendekati nilai SD
-                if ($tinggiBadan >= $valueFloat - $toleransi && $tinggiBadan <= $valueFloat + $toleransi) {
-                    $columnName = $key;
-                    break;
-                }
-            }
 
             $hasil = [];
 
-            if($tinggiBadan < $heightStandardArray['Panjang Badan (cm) -3 SD']){
+            if($tinggiBadan < floatval($heightStandardArray['Panjang Badan (cm) -3 SD'])){
                 $hasil["status"] = 1;
                 $hasil["rekomendasi"] = "Segera periksa ke puskesmas, pastikan konsumsi protein hewani!";
                 return ResponseFormatter::success($hasil,'Data telah diproses!');
-            }elseif($tinggiBadan > $heightStandardArray['Panjang Badan (cm) +3 SD']){
-                $hasil["status"] = 4;
-                $hasil["rekomendasi"] = "Pastikan carta mengukur anak Anda benar!";
-                return ResponseFormatter::success($hasil,'Data telah diproses!');
-            };
-
-            if($columnName == 'Panjang Badan (cm) -3 SD'){
-                $hasil["status"] = 1;
-                $hasil["rekomendasi"] = "Segera periksa ke puskesmas, pastikan konsumsi protein hewani!";
-                return ResponseFormatter::success($hasil,'Data telah diproses!');
-            }elseif($columnName == 'Panjang Badan (cm) -2 SD' || $columnName == 'Panjang Badan (cm) -1 SD'){
+            }elseif($tinggiBadan >= floatval($heightStandardArray['Panjang Badan (cm) -3 SD']) && $tinggiBadan < floatval($heightStandardArray['Panjang Badan (cm) -2 SD'])){
                 $hasil["status"] = 2;
                 $hasil["rekomendasi"] = "Segera periksa ke puskesmas, pastikan konsumsi protein hewani!";
                 return ResponseFormatter::success($hasil,'Data telah diproses!');
-            }elseif($columnName == 'Panjang Badan (cm) Median' || $columnName == 'Panjang Badan (cm) +1 SD' || $columnName == 'Panjang Badan (cm) +1 SD'){
+            }elseif($tinggiBadan >= floatval($heightStandardArray['Panjang Badan (cm) -2 SD']) && $tinggiBadan <= floatval($heightStandardArray['Panjang Badan (cm) +3 SD'])){
                 $hasil["status"] = 3;
                 $hasil["rekomendasi"] = "Pertahankan!";
                 return ResponseFormatter::success($hasil,'Data telah diproses!');
-            }elseif($columnName == 'Panjang Badan (cm) +3 SD'){
+            }elseif($tinggiBadan > floatval($heightStandardArray['Panjang Badan (cm) +3 SD'])){
                 $hasil["status"] = 4;
                 $hasil["rekomendasi"] = "Pastikan carta mengukur anak Anda benar!";
                 return ResponseFormatter::success($hasil,'Data telah diproses!');
@@ -169,8 +143,6 @@ class kalkulatorStuntingController extends Controller
             return ResponseFormatter::error(null, $e->getMessage(), 500);
         };
     }
-
-
 
 
     protected function simpanBeratBadan($bbNow,$user_id)

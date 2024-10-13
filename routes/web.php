@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\admin\dashboard;
 use App\Http\Controllers\artikelController;
@@ -66,3 +67,14 @@ Route::group(['prefix' => 'bidan'], function () {
 
 
 Route::post('/save-subscription-id', [posyanduController::class, 'saveSubs']);
+
+
+// for artisan:
+// Route::get('/run-migrate', function () {
+//     try {
+//         Artisan::call('migrate:fresh --seed');
+//         return response()->json(['message' => 'Migrasi dan seed telah dijalankan.']);
+//     } catch (\Exception $e) {
+//         return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+//     }
+// });
