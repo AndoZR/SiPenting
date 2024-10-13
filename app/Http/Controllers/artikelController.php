@@ -53,7 +53,7 @@ class artikelController extends Controller
 
     public function storeArtikel(Request $request) {
         $validator = Validator::make($request->all(), [
-            'judul' => 'required|string|max:100',
+            'judul' => 'required|string|max:120',
             'deskripsi' => 'required|string',
             'gambar' => 'required|max:3000|mimes:png,jpg',
             'video' => 'nullable|string|url',
@@ -85,7 +85,7 @@ class artikelController extends Controller
 
     public function updateArtikel(Request $request, $id) {
         $validator = Validator::make($request->all(), [
-            'judul' => 'string|max:100',
+            'judul' => 'string|max:120',
             'deskripsi' => 'string',
             'gambar' => 'max:3000|mimes:png,jpg',
             'video' => 'nullable|string|url',

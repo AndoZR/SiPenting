@@ -29,9 +29,10 @@ class kalkulatorStuntingController extends Controller
 
         $lila = $request->lila;
         $hb = $request->hb;
+        $bbNow = $request->bbNow;
+
         $bbPraHamil = Auth::user()->bbPraHamil;
         $tinggiBadan = Auth::user()->tinggiBadan;
-        $bbNow = $request->bbNow;
 
         // Menyimpan bb saat ini
         $user_id = Auth::user()->id;
@@ -69,19 +70,21 @@ class kalkulatorStuntingController extends Controller
             $issues["hb"] = "Segera cek kadar Hemoglobin di puskesmas terdekat!";
         }
 
-        // cek bb
+        // cek parameter tinggi badan dan bbprahamil
         if(!isset($bbPraHamil) || $bbPraHamil == 0 || !isset($tinggiBadan) || $tinggiBadan == 0){
-            return ResponseFormatter::error($bbPraHamil,'Data Berat Badan Pra Hamil / Tinggi Badan tidak boleh kosong, Silahkan lengkapi profil!', 500);
+            $issues["IMT"] = "Data Berat Badan Pra Hamil / Tinggi Badan tidak boleh kosong, Silahkan lengkapi profil atau konsultasi ke puskesmas!";
         }
-        $IMT = $bbPraHamil / (($tinggiBadan/100)**2);
-        if ($IMT < 18.5){
-            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 12.5 - 18 Kg";
-        }elseif ($IMT >= 18.5 && $IMT <= 24.9){
-            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 11.5 - 16 Kg";
-        }elseif ($IMT >= 25 && $IMT <= 29.9){
-            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 7 - 11.5 Kg";
-        }elseif ($IMT >= 30){
-            $issues["IMT"] = "IMT Pra-Kemalihan: $IMT, Rekomendasi Peningkatan Berat Badan: 5 - 9 Kg";
+        else{
+            $IMT = $bbPraHamil / (($tinggiBadan/100)**2);
+            if ($IMT < 18.5){
+                $issues["IMT"] = "Anda Memiliki Tinggi (". intval($tinggiBadan) . ") dan Berat Badan Pra-Hamil (" .intval($bbPraHamil) . ") Sehingga IMT Pra-Kehamilan: $IMT, Rekomendasi Peningkatan Berat Badan: 12.5 - 18 Kg";
+            }elseif ($IMT >= 18.5 && $IMT <= 24.9){
+                $issues["IMT"] = "Anda Memiliki Tinggi (". intval($tinggiBadan) . ") dan Berat Badan Pra-Hamil (" .intval($bbPraHamil) . ") Sehingga IMT Pra-Kehamilan: $IMT, Rekomendasi Peningkatan Berat Badan: 11.5 - 16 Kg";
+            }elseif ($IMT >= 25 && $IMT <= 29.9){
+                $issues["IMT"] = "Anda Memiliki Tinggi (". intval($tinggiBadan) . ") dan Berat Badan Pra-Hamil (" .intval($bbPraHamil) . ") Sehingga IMT Pra-Kehamilan: $IMT, Rekomendasi Peningkatan Berat Badan: 7 - 11.5 Kg";
+            }elseif ($IMT >= 30){
+                $issues["IMT"] = "Anda Memiliki Tinggi (". intval($tinggiBadan) . ") dan Berat Badan Pra-Hamil (" .intval($bbPraHamil) . ") Sehingga IMT Pra-Kehamilan: $IMT, Rekomendasi Peningkatan Berat Badan: 5 - 9 Kg";
+            }
         }
 
         // Cek Usia

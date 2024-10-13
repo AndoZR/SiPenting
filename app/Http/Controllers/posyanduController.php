@@ -156,7 +156,7 @@ class posyanduController extends Controller
             }
 
             // Kurangi 1 jam 30 menit dari waktu yang dijadwalkan
-            $notificationTime = $scheduleTime->subMinutes(90); // 1 jam 30 menit = 90 menit
+            $notificationTime = $scheduleTime->subMinutes(180); // 1 jam 30 menit = 90 menit
             
             $delay = $now->diffInSeconds($notificationTime, false);
 
@@ -244,27 +244,27 @@ class posyanduController extends Controller
         }
     }
 
-    public function sendNotif(Request $request) {
-        $contents = $request->query('contents');
-        $subscriptionIds = $request->query('subscription_ids');
-        $url = $request->query('url');
+    // public function sendNotif(Request $request) {
+    //     $contents = $request->query('contents');
+    //     $subscriptionIds = $request->query('subscription_ids');
+    //     $url = $request->query('url');
     
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Basic MzRkOTI0YWUtMWI5Yi00ZjRiLTlkZGMtNWViZmViNjUzODMw',
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ])->post('https://onesignal.com/api/v1/notifications', [
-                'app_id' => '58a17682-ac07-4856-9282-cc77cc855460',
-                'include_player_ids' => explode(',', $subscriptionIds),
-                'contents' => ['en' => 'testtttt'],
-                'url' => $url,
-            ]);
+    //     try {
+    //         $response = Http::withHeaders([
+    //             'Authorization' => 'Basic MzRkOTI0YWUtMWI5Yi00ZjRiLTlkZGMtNWViZmViNjUzODMw',
+    //             'Accept' => 'application/json',
+    //             'Content-Type' => 'application/json',
+    //         ])->post('https://onesignal.com/api/v1/notifications', [
+    //             'app_id' => '58a17682-ac07-4856-9282-cc77cc855460',
+    //             'include_player_ids' => explode(',', $subscriptionIds),
+    //             'contents' => ['en' => 'testtttt'],
+    //             'url' => $url,
+    //         ]);
     
-            return $response->body();
-        } catch (\Exception $e) {
-            report($e);
-            return response()->json(['error' => 'Failed to send notification'], 500);
-        }
-    }
+    //         return $response->body();
+    //     } catch (\Exception $e) {
+    //         report($e);
+    //         return response()->json(['error' => 'Failed to send notification'], 500);
+    //     }
+    // }
 }

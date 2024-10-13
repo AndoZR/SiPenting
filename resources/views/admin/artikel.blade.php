@@ -9,6 +9,17 @@
     {{-- <link rel="stylesheet" href="{{ asset('src/compiled/css/app-dark.css') }}"> --}}
     {{-- <link rel="stylesheet" href="{{ asset('src/compiled/css/iconly.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('src/compiled/css/table-datatable.css') }}">
+    <style>
+        .scrollable-description {
+            max-height: 100px !important; /* Batas tinggi cell deskripsi */
+            /* max-width: 300px !important; */
+            overflow-y: auto !important; /* Menampilkan scrollbar vertikal jika teks terlalu panjang */
+            overflow-x: hidden !important; /* Menyembunyikan scrollbar horizontal */
+            word-wrap: break-word !important; /* Memastikan teks terbungkus di dalam cell */
+            display: block;
+        }
+    </style>
+     
 @endpush
 
 @section('content')
@@ -20,7 +31,7 @@
                 DataTable
             </div>
             <div class="card-body">
-                <table class="table table-striped" id="table-artikel">
+                <table class="table" id="table-artikel">
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -196,7 +207,7 @@
                 {
                     targets: 2,
                     data: 'deskripsi',
-                    className: 'text-center align-middle',
+                    className: 'text-center align-middle scrollable-description',
                     render: function(data, type, row, meta) {
                         return data;
                     }
