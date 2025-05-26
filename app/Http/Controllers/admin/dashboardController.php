@@ -52,9 +52,10 @@ class dashboardController extends Controller
         };
 
         try{
-            $hashPassword = Hash::make($request->pw);
+            $hashPassword = Hash::make("puskesmas_".$request->pw);
             $data = akun_puskesmas::find($id); 
             $updateData = [
+                'username' => "puskesmas_".$request->pw,
                 'password' => $hashPassword
             ];
 
@@ -337,7 +338,7 @@ class dashboardController extends Controller
                 return ResponseFormatter::error($e->getMessage(), "Data Gagal Diprossess. Kesalahan Server", 500);
             }
         }
-        return view("admin.anak.giziDesa",["id" => $id]);
+        return view("admin.anak.stuntingDesa",["id" => $id]);
     }
 
 

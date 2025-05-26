@@ -53,7 +53,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Reset Password Puskesmas</h5>
+          <h5 class="modal-title">Setelah tersimpan, Ingat password ada tambahan "puskesmas_" di awal</h5>
           <button type="button" class="close rounded-pill" data-bs-dismiss="modal" aria-label="Close">
               <i data-feather="x"></i>
           </button>
@@ -63,8 +63,9 @@
           <div class="modal-body">
             <div class="row">
               <div class="col-12">
-                <div class="form-group">
-                  <label for="pw">Password Baru <span class="text-danger">*</span></label>
+                <label for="pw">Password Baru <span class="text-danger">*</span></label>
+                <div class="form-group input-group">
+                  <span class="input-group-text" id="basic-addon1">puskesmas_</span>
                   <input type="text" class="form-control" name="pw" id="pw" autofocus autocomplete="off">
                   <div class="invalid-feedback pw_error"></div>
                 </div>
@@ -72,8 +73,9 @@
             </div>
             <div class="row">
               <div class="col-12">
-                <div class="form-group">
                   <label for="confirm_pw">Konfirmasi Password <span class="text-danger">*</span></label>
+                <div class="form-group input-group">
+                  <span class="input-group-text" id="basic-addon1">puskesmas_</span>
                   <input type="text" class="form-control" name="confirm_pw" id="confirm_pw" autofocus autocomplete="off">
                   <div class="invalid-feedback confirm_pw_error"></div>
                 </div>

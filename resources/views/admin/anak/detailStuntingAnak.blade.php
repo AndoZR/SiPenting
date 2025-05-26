@@ -74,8 +74,8 @@
             },
             scales: {
                 y: {
-                    min: 1,
-                    max: 4,
+                    min: 0,
+                    max: 5,
                     ticks: {
                         stepSize: 1,
                         callback: function(value) {
