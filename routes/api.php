@@ -30,16 +30,18 @@ Route::middleware(['auth:api', 'role:1,2'])->group(function () {
 
 
 
-Route::middleware(['auth:api', 'role:1'])->group(function () {
+Route::middleware(['auth:api', 'role:1,3'])->group(function () {
     Route::group(['prefix'=>'kalkulatorGizi'], function () {
         Route::get('/', [kalkulatorGiziController::class, 'getMakanan'])->name('getMakanan');
         Route::post('/cekGizi', [kalkulatorGiziController::class, 'cekGizi'])->name('cekGizi');
+        Route::post('/cekGiziGuest', [kalkulatorGiziController::class, 'cekGiziGuest'])->name('cekGiziGuest');
     });
 
 
     Route::group(['prefix'=>'kalkulatorStunting'], function () {
         Route::post('/cekStuntingIbu', [kalkulatorStuntingController::class, 'cekStuntingIbu'])->name('cekStuntingIbu');
         Route::post('/cekStuntingAnak', [kalkulatorStuntingController::class, 'cekStuntingAnak'])->name('cekStuntingAnak');
+        Route::post('/cekStuntingAnakGuest', [kalkulatorStuntingController::class, 'cekStuntingAnakGuest'])->name('cekStuntingAnakGuest');
     });
 
 

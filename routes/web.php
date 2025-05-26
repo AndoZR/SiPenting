@@ -37,9 +37,15 @@ Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {
     Route::post('/login', [AuthController::class, 'webLoginProcess'])->name('login-web-process');
 });
 
+Route::middleware(['auth:bapeda','check'])->group(function() {
+    Route::group(['prefix' => 'akun_puskesmas', 'as' => 'akun_puskesmas.'], function () {
+        Route::get('/', [dashboardController::class, 'viewAkunPuskesmas'])->name('viewAkunPuskesmas');
+        Route::post('/changePassword/{id}', [dashboardController::class, 'changePassword'])->name('changePassword');
+    });
+});
 
 
-Route::middleware(['auth:bidan,puskesmas,bapeda,dinkes','check'])->group(function() {
+Route::middleware(['auth:bidan,puskesmas,bapeda','check'])->group(function() {
     Route::get('/home', [dashboardController::class, 'index'])->name('home');
 
     Route::group(['prefix' => 'artikel', 'as' => 'artikel.'], function () {
@@ -52,6 +58,21 @@ Route::middleware(['auth:bidan,puskesmas,bapeda,dinkes','check'])->group(functio
     Route::group(['prefix' => 'ibu-hamil', 'as' => 'ibu-hamil.'], function () {
         Route::get('/daftar', [dashboardController::class, 'daftar'])->name('ibu-hamil-daftar');
         Route::get('/graph/{id}', [dashboardController::class, 'graph'])->name('ibu-hamil-graph');
+    });
+
+    Route::group(['prefix' => 'anak', 'as' => 'anak.'], function () {
+        Route::get('/daftar', [dashboardController::class, 'daftarAnak'])->name('daftar-anak');
+        Route::get('/daftar/detail-gizi-anak/{id}', [dashboardController::class, 'detaildGiziAnak'])->name('detail-gizi-anak');
+        Route::get('/daftar/detail-stunting-anak/{id}', [dashboardController::class, 'detaildStuntingAnak'])->name('detail-stunting-anak');
+        
+        Route::get('/giziKecamatan', [dashboardController::class, 'daftarKecamatanGizi'])->name('daftar-kecamatan-gizi');
+        Route::get('/grafikGiziAnak/{id}', [dashboardController::class, 'graphGiziAnak'])->name('graph-gizi-anak');
+        Route::get('/giziDesa/{id}', [dashboardController::class, 'daftarDesaGizi'])->name('daftar-desa-gizi');
+        Route::get('/anak/export/village/{village_id}', [dashboardController::class, 'eksporExcel'])->name('anak.ekspor-excel');
+        
+        Route::get('/stuntingKecamatan', [dashboardController::class, 'daftarKecamatanStunting'])->name('daftar-kecamatan-stunting');
+        Route::get('/grafikStuntingAnak/{id}', [dashboardController::class, 'graphStuntingAnak'])->name('graph-stunting-anak');
+        Route::get('/giziStunting/{id}', [dashboardController::class, 'daftarDesaStunting'])->name('daftar-desa-stunting');
     });
 
     Route::get('/logout', [AuthController::class, 'logoutWeb'])->name('logout-web');

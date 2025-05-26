@@ -8,6 +8,7 @@ use App\Models\bayi;
 use App\Models\makanan;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
+use App\Models\hist_gizi;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -41,15 +42,28 @@ class kalkulatorGiziController extends Controller
             }
     
             // Mencari selisih bulan(Umur Bayi)
-            $umurBayi = round(Carbon::parse($bayi->tanggalLahir)->diffInMonths(now()));
-    
+            // $umurBayi = round(Carbon::parse($bayi->tanggalLahir)->diffInMonths(now()));
+            
+            $umurBayi = (now()->year - Carbon::parse($bayi->tanggalLahir)->year) * 12 
+          + (now()->month - Carbon::parse($bayi->tanggalLahir)->month);
+
             foreach($dataMakanan as $item){
                 $collectMakanan[] = $item[0];
                 $collectSdm[] = $item[1];
             }
-            // dd($collectMakanan);
     
             $hasil = $this->cekMakan($dataMakanan,$umurBayi,$collectMakanan);
+
+            // sesi simpan data untuk admin bapeda
+            hist_gizi::updateOrCreate(
+                [
+                    'id_bayi' => $request->idBayi,
+                    'tanggal' => now()->toDateString() // pastikan hanya tanggalnya saja yang dicek
+                ],
+                [
+                    'nilai_gizi' => json_encode([$hasil[0]['kecukupan'],$hasil[1]['kecukupan'],$hasil[2]['kecukupan'],$hasil[3]['kecukupan'],$hasil[4]['kecukupan']])
+                ]
+            );
     
             return ResponseFormatter::success($hasil, "Data Perhitungan Berhasil Didapatkan!");
         }catch(Exception $e){
@@ -70,13 +84,13 @@ class kalkulatorGiziController extends Controller
             foreach ($cekSdm as $key => $value) {
                 if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran minum ±$gelas gelas (800 mL)! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disarankan minum ±$gelas gelas (800 mL) per hari! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }else{
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran makan $sdm1-$sdm2 sendok makan! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disarankan makan $sdm1-$sdm2 sendok makan per porsi! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
@@ -94,13 +108,13 @@ class kalkulatorGiziController extends Controller
             foreach ($cekSdm as $key => $value) {
                 if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran minum ±3½ gelas (900 mL)! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disarankan minum ±3½ gelas (900 mL) per hari! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }else{
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran makan $sdm1-$sdm2 sendok makan! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disarankan makan $sdm1-$sdm2 sendok makan per porsi! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
@@ -118,13 +132,13 @@ class kalkulatorGiziController extends Controller
             foreach ($cekSdm as $key => $value) {
                 if($cekSdm[$key]['makanan'] == "Cairan (Air, Susu, dll)"){
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran minum ±$gelas gelas (1300 mL)! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disarankan minum ±$gelas gelas (1300 mL) per hari! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
                 }else{
                     if($cekSdm[$key]['keterangan'] == 'Kurang' || $cekSdm[$key]['keterangan'] == 'Berlebihan'){
-                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disaran makan $sdm1-$sdm2 sendok makan! Segera konsultasi!";
+                        $cekSdm[$key]['keterangan'] .= "! Umur $umurBayi bulan, disarankan makan $sdm1-$sdm2 sendok makan per porsi! Segera konsultasi!";
                     }else{
                         $cekSdm[$key]['keterangan'] .= "! Pertahankan ya!";
                     }
@@ -132,7 +146,14 @@ class kalkulatorGiziController extends Controller
             }
 
         }else{
-            return ["Data umur balita haraus 6 hingga 59 bulan!"];
+            $cekSdm = [
+                [
+                    'makanan'=>'Peringatan!',
+                    "keterangan"=>"Data umur balita harus 6 hingga 59 bulan",
+                    "kecukupan"=>"1"
+                ]
+            ];
+            return $cekSdm;
         }
         return $cekSdm;
     }
@@ -209,55 +230,41 @@ class kalkulatorGiziController extends Controller
         return $hasil;
     }
 
-    // private function cekMakanOld($dataMakanan,$umurBayi,$collectMakanan){
-    //     if ($umurBayi >= 6 && $umurBayi <= 8){
-    //         $cekSdm = $this->cekSdm($dataMakanan,2,3,$collectMakanan);
-    //     }elseif($umurBayi >= 9 && $umurBayi <= 11){
-    //         $cekSdm = $this->cekSdm($dataMakanan,3,4,$collectMakanan);
-    //     }elseif($umurBayi >= 12 && $umurBayi <= 23){
-    //         $cekSdm = $this->cekSdm($dataMakanan,4,5,$collectMakanan);
-    //     }else{
-    //         return "Data umur balita haraus 6 hingga 23 bulan!";
-    //     }
-    //     return $cekSdm;
-    // }
 
-    // private function cekSdmOld($dataMakanan,$sdm1,$sdm2,$collectMakanan){
-    //     $hasil = [];
+    // MODE GUEST
+    public function cekGiziGuest(Request $request) {   
+        try{
+            $dataMakanan = $request->data;
+            $collectMakanan = [];
+            $collectSdm = [];
+            $tglLahir = $request->tglLahir;
+    
+            // Menguraikan JSON menjadi array PHP
+            $dataMakanan = json_decode($dataMakanan, true);
+    
+            // Memastikan JSON berhasil diuraikan
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json(['error' => 'Invalid JSON'], 400);
+            }
+    
+            // Mencari selisih bulan(Umur Bayi)
+            $umurBayi = round(Carbon::parse($tglLahir)->diffInMonths(now()));
+            
+        //     $umurBayi = (now()->year - Carbon::parse($tglLahir)->year) * 12 
+        //   + (now()->month - Carbon::parse($tglLahir)->month);
 
-    //     $dbMakananExc = makanan::whereNotIn("id", $collectMakanan)->where('id', '!=', 1)->get("nama");
-    //     foreach($dbMakananExc as $x){
-    //         $hasil["makanExcept"][] = $x->nama . " Tidak Terpenuhi!";
-    //     }
+            foreach($dataMakanan as $item){
+                $collectMakanan[] = $item[0];
+                $collectSdm[] = $item[1];
+            }
+    
+            $hasil = $this->cekMakan($dataMakanan,$umurBayi,$collectMakanan);
+    
+            return ResponseFormatter::success($hasil, "Data Perhitungan Berhasil Didapatkan!");
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+            return ResponseFormatter::error(null, $e->getMessage(), 500);
+        };
+    }
 
-    //     $collectNamaMakanan = [];
-    //     $dbMakananTersedia = makanan::whereIn("id", $collectMakanan)->get("nama");
-    //     // $dbMakananTersedia = makanan::get("nama");
-    //     foreach($dbMakananTersedia as $y){
-    //         $collectNamaMakanan[] = $y->nama;
-    //     }
-        
-    //     $index = 0;
-    //     foreach($dataMakanan as $item) {
-    //         $item[0] = $collectNamaMakanan[$index];
-
-    //         if ($item[1] == 0){
-    //             $hasil["makanExcept"][] = $item[0] . " Tidak Terpenuhi!";
-    //             $index++;
-    //             continue;
-    //         } // kalo ada sdm 0 return tidak terpenuhi
-
-    //         if($item[0] == "Air Mineral"){ //exception buat air mineral, cus gak make sdm
-    //             $hasil["sdm"][] = "Konsumsi $item[0] cukup!";
-    //         }elseif(in_array($item[1], range($sdm1,$sdm2))){
-    //             $hasil["sdm"][] = "Konsumsi $item[0] cukup!";
-    //         }elseif($item[1] < $sdm1){
-    //             $hasil["sdm"][] = "Konsumsi $item[0] terlalu sedikit!";
-    //         }elseif($item[1] > $sdm2){
-    //             $hasil["sdm"][] = "Konsumsi $item[0] terlalu banyak!";
-    //         }
-    //         $index++;
-    //     }
-    //     return $hasil;
-    // }
 }

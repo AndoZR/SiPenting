@@ -89,7 +89,8 @@ return [
     |
     */
 
-    'ttl' => env('JWT_TTL', 720), // buat mengatur tenggat expires_in 720 berarti 720 menit
+    // 'ttl' => env('JWT_TTL', 720), // buat mengatur tenggat expires_in 720 berarti 720 menit
+    'ttl' => env('JWT_TTL', null), // buat mengatur tenggat expires_in 720 berarti 720 menit
 
     /*
     |--------------------------------------------------------------------------
@@ -138,7 +139,7 @@ return [
     'required_claims' => [
         'iss',
         'iat',
-        'exp',
+        // 'exp',
         'nbf',
         'sub',
         'jti',

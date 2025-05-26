@@ -15,13 +15,13 @@ class bayi extends Seeder
     public function run(): void
     {
         $nowDate = date('Y-m-d');
-        for($i = 0; $i <= 3; $i++) {
+        for($i = 0; $i <= 68; $i++) {
             DB::table('bayi')->insert([
                 [
-                    'nama' => 'Wiliam',
+                    'nama' => 'Balita' . $i,
                     'tanggalLahir' => "2024-01-01",
                     'kelamin' => "L",
-                    'id_users' => 1,
+                    'id_users' => 4 + $i,
                 ],
             ]);
         }

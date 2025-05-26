@@ -1,6 +1,6 @@
 @extends('admin.app')
-@section('title', 'Daftar Ibu')
-@section('sub-title', 'Dashboard / Daftar Ibu')
+@section('title', 'Data Gizi')
+@section('sub-title', 'Dashboard / Data Gizi Desa')
 
 @push('css')
     {{-- datatable --}}
@@ -20,16 +20,12 @@
                 DataTable
             </div>
             <div class="card-body">
-                <table class="table table-striped" id="table-bb">
+                <table class="table table-striped" id="table-desa">
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Nama</th>
-                            <th>Tanggal Lahir</th>
-                            <th>BB Pra</th>
-                            <th>Tinggi</th>
                             <th>Desa</th>
-                            <th>Aksi</th>
+                            <th>Excel</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,9 +48,11 @@
 
 <script>
     $(document).ready(function () {
-        let urlTest = '{{ route('ibu-hamil.ibu-hamil-daftar') }}';
+        const id = {{ $id }};
+        let url = '{{ route('anak.daftar-desa-gizi', ['id' => ':id']) }}';
+        url = url.replace(':id', id);
 
-        let tableArtikel = $('#table-bb').DataTable({
+        let tableAnak = $('#table-desa').DataTable({
             paging: true,
             lengthChange: false,
             searching: true,
@@ -63,7 +61,7 @@
             autoWidth: true,
             responsive: true,
             ajax: {
-                url: urlTest,
+                url: url,
                 type: "GET"
             },
             columnDefs: [
@@ -77,7 +75,7 @@
                 },
                 {
                     targets: 1,
-                    data: 'namaIbu',
+                    data: 'name',
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
                         return data;
@@ -85,45 +83,13 @@
                 },
                 {
                     targets: 2,
-                    data: 'tanggalLahir',
-                    className: 'text-center align-middle',
-                    render: function(data, type, row, meta) {
-                        return data;
-                    }
-                },
-                {
-                  targets: 3,
-                  data: 'bbPraHamil',
-                  className: 'text-center align-middle',
-                  render: function(data, type, row, meta) {
-                        return data;
-                    }
-                },
-                {
-                  targets: 4,
-                  data: 'tinggiBadan',
-                  className: 'text-center align-middle',
-                  render: function(data, type, row, meta) {
-                        return data;
-                    }
-                },
-                {
-                    targets: 5,
-                    data: null,
-                    className: 'text-center align-middle',
-                    render: function(data, type, row, meta) {
-                        return data.villages.name;
-                    }
-                },
-                {
-                    targets: 6,
                     data: null,
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
                         var id = data.id;
-                        var url = `{{ route('ibu-hamil.ibu-hamil-graph', ['id' => ':id']) }}`;
-                        url = url.replace(':id', id);
-                        $button = `<a href="${url}" class="btn btn-warning btn-edit" title="BB Saat Ini">Lihat BB</a>`;
+                        var url1 = `{{ route('anak.anak.ekspor-excel', ['village_id' => ':id']) }}`;
+                        url1 = url1.replace(':id', id);
+                        $button = `<a href="${url1}" class="btn btn-success btn-edit" title="Ekspor Excel">Ekspor</a>`;
                         return $button;
                     }
                 },

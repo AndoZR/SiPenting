@@ -54,9 +54,16 @@ class AuthController extends Controller
     {
         // Ambil hanya username dari request
         $username = request('username');
-        
-        // Cek jika username ada di database
-        $user = User::where('username', $username)->first();
+
+        if(preg_match('/^3511/', $username)){
+            // Cek jika username warga bondowoso ada di database
+            $user = User::where('username', $username)->first();
+        }elseif (empty($username)) {
+            // cek guest -> idnya 7 di database user '1919191919191919' sebagai default
+            $user = User::where('username', '1919191919191919')->first();
+        }else{
+            return ResponseFormatter::error(null,"Aplikasi ini hanya dapat digunakan oleh warga Bondowoso, harap gunakan guest mode untuk mengakses aplikasi kalkulator gizi, stunting, dan juga informasi terkait stunting!",422);
+        }
     
         if (!$user) {
             return ResponseFormatter::error(null,"Pengguna Tidak Ditemukan, Pastikan Username Anda Benar!",422);
@@ -123,7 +130,18 @@ class AuthController extends Controller
     public function register(Request $request)
     {
             $validator = Validator::make($request->all(), [
-                'username' => 'required|integer|digits:16|unique:users,nik',
+                'username' => [
+                    'required',
+                    'integer',
+                    'digits:16',
+                    'unique:users,nik',
+                    function ($attribute, $value, $fail) {
+                        // Cek apakah username dimulai dengan '3511'
+                        if (!preg_match('/^3511/', $value)) {
+                            $fail("Aplikasi ini hanya dapat digunakan oleh warga Bondowoso, harap gunakan guest mode untuk mengakses aplikasi kalkulator gizi, stunting, dan juga informasi terkait stunting.");
+                        }
+                    },
+                ],
                 // 'tanggalLahir' => 'required|date',
                 'namaIbu' => 'required|string|max:255',
                 // 'tinggiBadan' => 'required|integer',
@@ -329,12 +347,9 @@ class AuthController extends Controller
             if (Str::startsWith($username, 'bapeda_')) {
                 $user = akun_bapeda::where('username', $username)->first();
                 Auth::guard('bapeda')->login($user);
-            } elseif (Str::startsWith($username, 'dinkes_')) {
-                $user = akun_dinkes::where('username', $username)->first();
-                Auth::guard('dinkes')->login($user);
-            } elseif (Str::startsWith($username, 'puskemas_')) {
+            } elseif (Str::startsWith($username, 'puskesmas_')) {
                 $user = akun_puskesmas::where('username', $username)->first();
-                Auth::guard('puskemas')->login($user);
+                Auth::guard('puskesmas')->login($user);
             } elseif (Str::startsWith($username, 'bidan_')) {
                 $user = akun_bidan::where('username', $username)->first();
                 Auth::guard('bidan')->login($user);
@@ -362,5 +377,5 @@ class AuthController extends Controller
     
         // Arahkan ke halaman login
         return redirect('/login');
-    }    
+    }
 }

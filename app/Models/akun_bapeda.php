@@ -14,8 +14,9 @@ class akun_bapeda extends Model
     protected $table = 'akun_bapeda';
 
     protected $fillable = [
-        'username',
-        'nama',
+        'name',
+        'email',
         'password',
+        'id_puskesmas'
     ];
 }

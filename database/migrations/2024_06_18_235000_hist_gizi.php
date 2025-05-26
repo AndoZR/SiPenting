@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('hist_gizi', function (Blueprint $table) {
             $table->id();
-            $table->string('detail_gizi');
-            $table->integer('total_gizi');
-            $table->unsignedBigInteger('id_users');
-            $table->foreign('id_users')->references('id')->on('users')->onDelete('cascade');
+            $table->date('tanggal');
+            $table->text('nilai_gizi');
+            $table->unsignedBigInteger('id_bayi');
+            $table->foreign('id_bayi')->references('id')->on('bayi')->onDelete('cascade');
         });
     }
 

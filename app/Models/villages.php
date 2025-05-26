@@ -14,7 +14,7 @@ class villages extends Model
     public $timestamps = false;
 
     protected $fillable= [
-        'id ',
+        'id',
         'district_id',
         'name',
     ];
@@ -25,4 +25,10 @@ class villages extends Model
     {
         return $this->hasMany(User::class, 'id_villages');  // 'village_id' adalah foreign key di tabel users
     }
+
+    public function district()
+    {
+        return $this->belongsTo(districts::class, 'district_id');
+    }
+
 }

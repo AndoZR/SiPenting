@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class districts extends Model
+class hist_stun extends Model
 {
     use HasFactory;
 
-    protected $table = 'districts';
+    protected $table = 'hist_stun';
 
     public $timestamps = false;
 
     protected $fillable= [
-        'id',
-        'regency_id ',
-        'name',
+        'jenis',
+        'tanggal',
+        'id_bayi'
     ];
 }

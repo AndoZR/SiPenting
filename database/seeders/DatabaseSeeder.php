@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             bayi::class,
             dataStunt::class,
             artikelSeeder::class,
-            bbNowSeeder::class,
+            histGizi::class,
+            histStun::class,
         ]);
     }
 }
