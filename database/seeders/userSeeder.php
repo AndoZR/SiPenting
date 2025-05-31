@@ -67,14 +67,32 @@ class userSeeder extends Seeder
         ]);
 
         // Puskesmas user
-        DB::table('akun_puskesmas')->insert([
-            [
-                'username' => "puskesmas_admin",
-                'name' => "Puskesmas",
-                'password' => hash::make('puskesmas_admin'),
-                'created_at' => $nowDate,
-            ],
-        ]);
+        $dataKecamatan = [
+            3511010,3511020,
+            3511030,3511031,
+            3511040,3511050,
+            3511060,3511061,
+            3511070,3511080,
+            3511090,3511100,
+            3511110,3511111,
+            3511120,3511130,
+            3511140,3511141,
+            3511150,3511151,
+            3511152,3511160,
+            3511170
+        ];
+
+        for ($i = 1; $i <= 25; $i++) {
+            DB::table('akun_puskesmas')->insert([
+                [
+                    'name' => "Puskesmas" . $i,
+                    'nomor' => "08121212121" . $i,
+                    'id_district' => $i >= 23 ? $dataKecamatan[22] : $dataKecamatan[$i - 1],
+                    'password' => hash::make('puskesmas_admin' . $i),
+                    'created_at' => $nowDate,
+                ],
+            ]);
+        }
 
         //Inject All NPC
         $villages = [

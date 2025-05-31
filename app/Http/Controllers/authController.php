@@ -328,33 +328,27 @@ class AuthController extends Controller
         return view('login');
     }
 
-    public function webLoginProcess(Request $request) {
+    public function loginBapeda(Request $request) {
         // Validasi input hanya untuk username
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string',
+            'password' => 'required|string|min:8',
         ]);
     
         if ($validator->fails()) {
             // Kirimkan pesan error pertama
-            return redirect()->route('login-web')->with('error', $validator->errors()->first());
+            return redirect()->route('login')->with('error', $validator->errors()->first());
         }
     
         try {
             // Mencari user berdasarkan username
-            $username = $request->input('username');
+            $password = $request->input('password');  // Ambil input password dari form
+            $akunBapeda = akun_bapeda::first();       // Ambil satu-satunya akun bapeda dari database
 
-            // Memeriksa apakah username dimulai dengan 'bapeda_'
-            if (Str::startsWith($username, 'bapeda_')) {
-                $user = akun_bapeda::where('username', $username)->first();
-                Auth::guard('bapeda')->login($user);
-            } elseif (Str::startsWith($username, 'puskesmas_')) {
-                $user = akun_puskesmas::where('username', $username)->first();
-                Auth::guard('puskesmas')->login($user);
-            } elseif (Str::startsWith($username, 'bidan_')) {
-                $user = akun_bidan::where('username', $username)->first();
-                Auth::guard('bidan')->login($user);
+            if ($akunBapeda && Hash::check($password, $akunBapeda->password)) {
+                Auth::guard('bapeda')->login($akunBapeda);
+                // Redirect atau logic setelah login sukses
             } else {
-                return redirect()->route('login-web')->with('error', 'Pengguna tidak valid.');
+                return redirect()->route('login')->with('error', 'Password salah atau akun tidak ditemukan.');
             }
 
             // Regenerasi session untuk mencegah session fixation attacks
@@ -364,7 +358,44 @@ class AuthController extends Controller
             return redirect('home');
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            return redirect()->route('login-web')->with('error', $e->getMessage());
+            return redirect()->route('login')->with('error', $e->getMessage());
+        }
+    }   
+
+    public function loginPuskesmas(Request $request) {
+        // Validasi input hanya untuk username
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:8',
+        ]);
+    
+        if ($validator->fails()) {
+            // Kirimkan pesan error pertama
+            return redirect()->route('login')->with('error', $validator->errors()->first());
+        }
+    
+        try {
+            // Mencari user berdasarkan username
+            $password = $request->input('password');
+
+            $akunPuskesmas = akun_puskesmas::all()->filter(function($akun) use ($password) {
+                return Hash::check($password, $akun->password);
+            })->first();
+
+            if ($akunPuskesmas) {
+                Auth::guard('puskesmas')->login($akunPuskesmas);
+                // lanjutkan login
+            } else {
+                return redirect()->route('login')->with('error', 'Akun tidak ditemukan.');
+            }
+
+            // Regenerasi session untuk mencegah session fixation attacks
+            $request->session()->regenerate();
+
+            // Arahkan ke halaman setelah login
+            return redirect('home');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->route('login')->with('error', $e->getMessage());
         }
     }    
 

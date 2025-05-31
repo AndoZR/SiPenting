@@ -30,7 +30,7 @@ class dashboardController extends Controller
     public function viewAkunPuskesmas(Request $request){
         if($request->ajax()) {
             try{
-                $dataAkun = akun_puskesmas::get();
+                $dataAkun = akun_puskesmas::with('districts')->get();
 
                 return ResponseFormatter::success($dataAkun,"Berhasil Mendapatkan Data Akun!");
             } catch (Exception $e) {
@@ -38,13 +38,17 @@ class dashboardController extends Controller
                 return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
             }
         }
-        return view('admin.akunPuskesmas');
+        $dataKecamatan = districts::where("regency_id",3511)->get();
+        return view('admin.akunPuskesmas', ["dataKecamatan" => $dataKecamatan]);
     }
 
-    public function changePassword($id, Request $request) {
+    public function addPuskesmas(Request $request) {
         $validator = Validator::make($request->all(), [
-            'pw' => 'string|max:100',
-            'confirm_pw' => 'string|max:100',
+            'nama' => 'required|string|max:100',
+            'nomor' => 'required|string|regex:/^[0-9]{10,15}$/|unique:akun_puskesmas,nomor',
+            'kec' => 'required|exists:districts,id',
+            'password' => 'required|string|min:8|max:100',
+            'confirm_password' => 'required|same:password',
         ]);
 
         if ($validator->fails()) {
@@ -52,11 +56,55 @@ class dashboardController extends Controller
         };
 
         try{
-            $hashPassword = Hash::make("puskesmas_".$request->pw);
+            $inputPassword = $request->input('password');
+            $semuaAkun = akun_puskesmas::all();
+
+            foreach ($semuaAkun as $akun) {
+                if (Hash::check($inputPassword, $akun->password)) {
+                    return ResponseFormatter::error(null, [
+                        'password' => ['Password sudah digunakan Akun lain']
+                    ], 422);
+                }
+            }
+
+            $hashPassword = Hash::make($request->password);
+
+            $data = akun_puskesmas::create([
+                'name' => $request->nama,
+                'nomor' => $request->nomor,
+                'id_district' => $request->kec,
+                'password' => $hashPassword,
+            ]);
+
+            return ResponseFormatter::success($data,"Berhasil Menambah Data Akun Puskesmas!");
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+        }
+        return view('admin.akunPuskesmas');
+    }
+
+    public function changePassword($id, Request $request) {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'string|max:100',
+            'nomor' => 'string|regex:/^[0-9]{10,15}$/|unique:akun_puskesmas,nomor,' . $id,
+            'kec' => 'exists:districts,id',
+            'password' => 'string|min:8|max:100|nullable',
+            'confirm_password' => 'same:password|nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(null,$validator->errors(),422);
+        };
+
+        try{
+            $hashPassword = Hash::make($request->password);
             $data = akun_puskesmas::find($id); 
             $updateData = [
-                'username' => "puskesmas_".$request->pw,
-                'password' => $hashPassword
+                'name' => $request->nama,
+                'nomor' => $request->nomor,
+                'id_district' => $request->kec,
+                'password' => $hashPassword,
             ];
 
             // Update data

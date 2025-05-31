@@ -7,39 +7,84 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-  <div class="wrapper">
+    <div class="wrapper">
     <div class="logo">
         <img src="{{ asset('src/img/logo.png') }}" alt="">
     </div>
     <div class="text-center mt-4 name">
         Sipenting
     </div>
-    <form class="p-3 mt-5" action="{{ route('login-web-process') }}" method="POST">
-      @csrf
-        <div class="form-field d-flex align-items-center mb-5">
-            <span class="far fa-user"></span>
-            <input type="text" name="username" id="username" placeholder="Masukkan Username">
+
+    <!-- Tombol Role -->
+    <div class="d-flex flex-column px-3 mt-4">
+        <span class="mb-2 text-muted text-center">Pilih Role Admin Sebagai:</span>
+        <div class="d-flex justify-content-between" style="gap: 1rem;">
+            <button type="button" class="btn role-btn active" id="btn-bapeda">Bapeda</button>
+            <button type="button" class="btn role-btn inactive" id="btn-puskesmas">Puskesmas</button>
         </div>
-        {{-- <div class="form-field d-flex align-items-center">
-            <span class="fas fa-key"></span>
-            <input type="password" name="password" id="pwd" placeholder="Password">
-        </div> --}}
-        <button class="btn mt-5">Masuk</button>
-    </form>
-    <div class="text-center fs-6">
-        {{-- <a href="#">Forget password?</a> --}}
-        {{-- or --}}
-        {{-- <a href="#">Register</a> --}}
     </div>
-  </div>
+
+    <!-- Form Login -->
+    <form class="p-3 mt-4" id="form-login" method="POST" action="{{ route('login-web-bapeda') }}">
+        @csrf
+        <div class="form-field d-flex align-items-center mb-4">
+        <span class="fas fa-lock"></span>
+        <input type="password" name="password" id="password" placeholder="Masukkan Password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-2">Masuk</button>
+    </form>
+    </div>
 </body>
 </html>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+  const btnBapeda = document.getElementById('btn-bapeda');
+  const btnPuskesmas = document.getElementById('btn-puskesmas');
+  const form = document.getElementById('form-login');
+
+  btnBapeda.addEventListener('click', () => {
+    form.action = "{{ route('login-web-bapeda') }}";
+    btnBapeda.classList.add('active');
+    btnBapeda.classList.remove('inactive');
+    btnPuskesmas.classList.add('inactive');
+    btnPuskesmas.classList.remove('active');
+  });
+
+  btnPuskesmas.addEventListener('click', () => {
+    form.action = "{{ route('login-web-puskesmas') }}";
+    btnPuskesmas.classList.add('active');
+    btnPuskesmas.classList.remove('inactive');
+    btnBapeda.classList.add('inactive');
+    btnBapeda.classList.remove('active');
+  });
+</script>
+
 <style>
   /* Importing fonts from Google */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+    .role-btn {
+        width: 49%;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    /* Tombol aktif: warna cerah dan jelas */
+    .role-btn.active {
+        background-color: #ff6b00; /* oranye terang */
+        color: white;
+        opacity: 1;
+    }
+
+    /* Tombol tidak aktif: warna pudar */
+    .role-btn.inactive {
+        background-color: #ff6b00;
+        color: white;
+        opacity: 0.5;
+    }
 
   /* Reseting */
   * {

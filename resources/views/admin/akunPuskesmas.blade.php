@@ -35,8 +35,9 @@
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Username</th>
                             <th>Name</th>
+                            <th>Nomor</th>
+                            <th>Daerah</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -49,35 +50,64 @@
 </main>
 
 <!-- Modal Ganti Password -->
-<div class="modal fade" id="modal-ganti_pw" tabindex="-1" role="dialog" aria-labelledby="modalCreate" aria-hidden="true">
+<div class="modal fade" id="modal-akun" tabindex="-1" role="dialog" aria-labelledby="modalCreate" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Setelah tersimpan, Ingat password ada tambahan "puskesmas_" di awal</h5>
+          <h5 class="modal-title">Atur Akun</h5>
           <button type="button" class="close rounded-pill" data-bs-dismiss="modal" aria-label="Close">
               <i data-feather="x"></i>
           </button>
         </div>
-        <form id="form-ganti-pw">
+        <form id="form-akun">
           @csrf
           <div class="modal-body">
             <div class="row">
               <div class="col-12">
-                <label for="pw">Password Baru <span class="text-danger">*</span></label>
-                <div class="form-group input-group">
-                  <span class="input-group-text" id="basic-addon1">puskesmas_</span>
-                  <input type="text" class="form-control" name="pw" id="pw" autofocus autocomplete="off">
-                  <div class="invalid-feedback pw_error"></div>
+                  <div class="form-group">
+                  <label for="nama">Nama Puskesmas <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="nama" id="nama" autofocus autocomplete="off">
+                  <div class="invalid-feedback nama_error"></div>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-12">
-                  <label for="confirm_pw">Konfirmasi Password <span class="text-danger">*</span></label>
+                  <div class="form-group">
+                  <label for="nomor">Nomor Kontak <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="nomor" id="nomor" autofocus autocomplete="off">
+                  <div class="invalid-feedback nomor_error"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                  <div class="form-group">
+                  <label for="kec">Kecamatan <span class="text-danger">*</span></label>
+                  <select class="form-select" name="kec" id="kec">
+                    @foreach ($dataKecamatan as $kecamatan)
+                        <option class="" value="{{ $kecamatan->id }}">{{ $kecamatan->name }}</option>
+                    @endforeach
+                  </select>
+                  <div class="invalid-feedback kec_error"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <label for="password">Password <span class="text-danger">*</span></label>
                 <div class="form-group input-group">
-                  <span class="input-group-text" id="basic-addon1">puskesmas_</span>
-                  <input type="text" class="form-control" name="confirm_pw" id="confirm_pw" autofocus autocomplete="off">
-                  <div class="invalid-feedback confirm_pw_error"></div>
+                  <input type="text" class="form-control" name="password" id="password" autofocus autocomplete="off">
+                  <div class="invalid-feedback password_error"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                  <label for="confirm_password">Konfirmasi Password <span class="text-danger">*</span></label>
+                <div class="form-group input-group">
+                  <input type="text" class="form-control" name="confirm_password" id="confirm_password" autofocus autocomplete="off">
+                  <div class="invalid-feedback confirm_password_error"></div>
                 </div>
               </div>
             </div>
@@ -117,9 +147,11 @@
             idAkunPuskesmas = undefined;
         });
 
+        const dataKecamatan = @json($dataKecamatan);
+
         var idAkunPuskesmas;
         let url;
-        let urlTest = '{{ route('akun_puskesmas.viewAkunPuskesmas') }}';
+        let urlView = '{{ route('akun_puskesmas.viewAkunPuskesmas') }}';
 
         let tableAkunPuskesmas = $('#table-akun-puskesmas').DataTable({
             paging: true,
@@ -130,8 +162,21 @@
             autoWidth: true,
             responsive: true,
             ajax: {
-                url: urlTest,
+                url: urlView,
                 type: "GET"
+            },
+            layout: {
+                topStart: {
+                    buttons: [
+                        {
+                            text: '<i class="fas fa-plus mr-2"></i> Tambah Data',
+                            className: 'btn btn-primary mb-2 mt-2',
+                            action: function(e, dt, node, config) {
+                                $('#modal-akun').modal('show');
+                            }
+                        }
+                    ]
+                },
             },
             columnDefs: [
                 {
@@ -144,14 +189,6 @@
                 },
                 {
                     targets: 1,
-                    data: 'username',
-                    className: 'text-center align-middle',
-                    render: function(data, type, row, meta) {
-                        return data;
-                    }
-                },
-                {
-                    targets: 2,
                     data: 'name',
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
@@ -159,11 +196,27 @@
                     }
                 },
                 {
+                    targets: 2,
+                    data: 'nomor',
+                    className: 'text-center align-middle',
+                    render: function(data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
                     targets: 3,
+                    data: 'districts.name',
+                    className: 'text-center align-middle',
+                    render: function(data, type, row, meta) {
+                        return data;
+                    }
+                },
+                {
+                    targets: 4,
                     data: null,
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
-                        $button = `<button class="btn btn-warning btn-pw" title="Ubah">Ganti Password</button>`;
+                        $button = `<button class="btn btn-warning btn-pw" title="Ubah">Ubah Akun</button>`;
                         return $button;
                     }
                 },
@@ -174,34 +227,28 @@
         $('#table-akun-puskesmas tbody').on('click', '.btn-pw', function() {
             var data = tableAkunPuskesmas.row($(this).parents('tr')).data();
             idAkunPuskesmas = data.id;
+
+            // set form action
+            $('input[name="nama"]').val(data.name);
+            $('#kec').val(data.districts.id); // akan memilih option dengan value sesuai id kecamatan
+            $('input[name="nomor"]').val(data.nomor);
+
             // show modal
-            $('#modal-ganti_pw').modal('show');
+            $('#modal-akun').modal('show');
         });
 
-        // Submit Form Create art
-        $('#form-ganti-pw').submit(function(e) {
+        // Submit Form Create/edit akun
+        $('#form-akun').submit(function(e) {
             e.preventDefault();
-            url = "{{ route('akun_puskesmas.changePassword', ['id' => ':id']) }}";
-            url = url.replace(':id', idAkunPuskesmas)
 
-            // Ambil nilai dari input
-            var pw = $('#pw').val();
-            var confirmPw = $('#confirm_pw').val();
-
-            // Reset pesan error sebelumnya
-            $('.pw_error').text('');
-            $('.confirm_pw_error').text('');
-            $('#pw, #confirm_pw').removeClass('is-invalid');
-
-            // Cek kecocokan password
-            if (pw !== confirmPw) {
-                // Tampilkan error
-                $('#confirm_pw').addClass('is-invalid');
-                $('.confirm_pw_error').text('Password tidak cocok.');
-                return; // Hentikan proses submit
+            if(idAkunPuskesmas !== undefined){
+                url = "{{ route('akun_puskesmas.changePassword', ['id' => ':id']) }}";
+                url = url.replace(':id', idAkunPuskesmas)
+            }else{
+                url = "{{ route('akun_puskesmas.addPuskesmas') }}";
             }
 
-            var formData = new FormData($("#form-ganti-pw")[0]);
+            var formData = new FormData($("#form-akun")[0]);
 
             $.ajax({
                 type: "POST",
@@ -213,7 +260,7 @@
                     $('*').removeClass('is-invalid');
                 },
                 success: function(response) {
-                    $('#modal-ganti_pw').modal('hide');
+                    $('#modal-akun').modal('hide');
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil Tersimpan!',
@@ -248,6 +295,77 @@
                 }
             });
         });
+
+        // Submit Form Create art
+        // $('#form-akun').submit(function(e) {
+        //     e.preventDefault();
+        //     url = "{{ route('akun_puskesmas.changePassword', ['id' => ':id']) }}";
+        //     url = url.replace(':id', idAkunPuskesmas)
+
+        //     // Ambil nilai dari input
+        //     var pw = $('#pw').val();
+        //     var confirmPw = $('#confirm_pw').val();
+
+        //     // Reset pesan error sebelumnya
+        //     $('.pw_error').text('');
+        //     $('.confirm_pw_error').text('');
+        //     $('#pw, #confirm_pw').removeClass('is-invalid');
+
+        //     // Cek kecocokan password
+        //     if (pw !== confirmPw) {
+        //         // Tampilkan error
+        //         $('#confirm_pw').addClass('is-invalid');
+        //         $('.confirm_pw_error').text('Password tidak cocok.');
+        //         return; // Hentikan proses submit
+        //     }
+
+        //     var formData = new FormData($("#form-akun")[0]);
+
+        //     $.ajax({
+        //         type: "POST",
+        //         url: url,
+        //         data: formData,
+        //         processData: false,
+        //         contentType: false,
+        //         beforeSend: function() {
+        //             $('*').removeClass('is-invalid');
+        //         },
+        //         success: function(response) {
+        //             $('#modal-akun').modal('hide');
+        //             Swal.fire({
+        //                 icon: 'success',
+        //                 title: 'Berhasil Tersimpan!',
+        //                 text: response.meta.message,
+        //             });
+        //             tableAkunPuskesmas.ajax.reload();
+        //         },
+        //         error: function(xhr, ajaxOptions, thrownError) {
+        //             switch (xhr.status) {
+        //                 case 422:
+        //                 var errors = xhr.responseJSON.meta.message;
+        //                 var message = '';
+        //                 $.each(errors, function(key, value) {
+        //                     message = value;
+        //                     $('*[name="' + key + '"]').addClass('is-invalid');
+        //                     $('.invalid-feedback.' + key + '_error').html(value);
+        //                 });
+        //                 Swal.fire({
+        //                     icon: 'error',
+        //                     title: 'Gagal!',
+        //                     text: message,
+        //                 })
+        //                 break;
+        //                 default:
+        //                 Swal.fire({
+        //                     icon: 'error',
+        //                     title: 'Gagal!',
+        //                     text: 'Terjadi kesalahan, Kesalahan Server!',
+        //                 })
+        //                 break;
+        //             }
+        //         }
+        //     });
+        // });
     })
 </script>
 @endpush

@@ -34,13 +34,15 @@ Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {
         return view("login");
     });
     Route::get('/login', [AuthController::class, 'loginWeb'])->name('login');
-    Route::post('/login', [AuthController::class, 'webLoginProcess'])->name('login-web-process');
+    Route::post('/login/bapeda', [AuthController::class, 'loginBapeda'])->name('login-web-bapeda');
+    Route::post('/login/puskesmas', [AuthController::class, 'loginPuskesmas'])->name('login-web-puskesmas');
 });
 
 Route::middleware(['auth:bapeda','check'])->group(function() {
     Route::group(['prefix' => 'akun_puskesmas', 'as' => 'akun_puskesmas.'], function () {
         Route::get('/', [dashboardController::class, 'viewAkunPuskesmas'])->name('viewAkunPuskesmas');
         Route::post('/changePassword/{id}', [dashboardController::class, 'changePassword'])->name('changePassword');
+        Route::post('/tambah', [dashboardController::class, 'addPuskesmas'])->name('addPuskesmas');
     });
 });
 

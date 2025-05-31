@@ -14,8 +14,13 @@ class akun_puskesmas extends Model
     protected $table = 'akun_puskesmas';
 
     protected $fillable = [
-        'username',
-        'nama',
+        'name',
+        'nomor',
+        'id_district',
         'password',
     ];
+
+    public function districts() {
+        return $this->belongsTo(districts::class, 'id_district');
+    }
 }

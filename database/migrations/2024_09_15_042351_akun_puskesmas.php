@@ -10,8 +10,10 @@ return new class extends Migration
     {
         Schema::create('akun_puskesmas', function (Blueprint $table) {
             $table->id();
-            $table->string('username');
             $table->string('name');
+            $table->string('nomor',15)->unique();
+            $table->char('id_district',7)->nullable();
+            $table->foreign('id_district')->references('id')->on('districts')->onDelete('cascade');
             // $table->string('email')->unique();
             // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
