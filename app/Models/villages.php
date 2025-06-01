@@ -31,4 +31,10 @@ class villages extends Model
         return $this->belongsTo(districts::class, 'district_id');
     }
 
+    public function puskesmas()
+    {
+        return $this->belongsToMany(akun_puskesmas::class, 'pivot_puskesmas_village', 'village_id', 'puskesmas_id');
+    }
+
+
 }

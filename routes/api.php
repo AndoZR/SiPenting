@@ -12,6 +12,7 @@ use App\Http\Controllers\artikelController;
 use App\Http\Controllers\posyanduController;
 use App\Http\Controllers\kalkulatorGiziController;
 use App\Http\Controllers\kalkulatorStuntingController;
+use App\Models\pivot_puskesmas_village;
 
 Route::get('/kontak/', function() {
     $idVillage = Auth::user()->id_villages;
@@ -27,8 +28,19 @@ Route::get('/kontak/', function() {
         return response()->json(['message' => 'Desa atau kecamatan tidak ditemukan'], 404);
     }
 
-    // Cari puskesmas dengan id_district yang sesuai
-    $puskesmas = akun_puskesmas::where('id_district', $desa->district->id)->first();
+    $puskesmas = null;
+
+    if ($desa->district->id == '3511100') {
+        // Kecamatan Bondowoso → ambil dari pivot relasi puskesmas_village
+        $puskesmas = akun_puskesmas::whereHas('villages', function ($query) use ($idVillage) {
+            $query->where('villages.id', $idVillage);
+        })->first();
+
+    } else {
+        // Selain Kecamatan Bondowoso → ambil dari kolom id_district
+        $puskesmas = akun_puskesmas::where('id_district', $desa->district->id)->first();
+    }
+
 
     if (!$puskesmas || !$puskesmas->nomor) {
         return response()->json(['message' => 'Nomor WA tidak ditemukan'], 404);

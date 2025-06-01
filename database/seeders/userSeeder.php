@@ -59,14 +59,14 @@ class userSeeder extends Seeder
         // bapeda user
         DB::table('akun_bapeda')->insert([
             [
-                'username' => "bapeda_admin",
+                'name' => "bapeda_admin",
                 'email' => "bapeda@gmail.com",
                 'password' => hash::make('bapeda_admin'),
                 'created_at' => $nowDate,
             ],
         ]);
 
-        // Puskesmas user
+        // Puskesmas user SEED
         $dataKecamatan = [
             3511010,3511020,
             3511030,3511031,
@@ -92,6 +92,38 @@ class userSeeder extends Seeder
                     'created_at' => $nowDate,
                 ],
             ]);
+        }
+
+        $dataPivotDesa = [
+            // puskesmas_id => [array desa ids]
+            23 => [
+                '3511100004', // Nangkaan
+                '3511100007', // Badean
+                '3511100002', // Sukowiryo
+                '3511100001', // Pancoran
+                '3511100003', // Kembang
+            ],
+            24 => [
+                '3511100010', // Kademangan
+                '3511100005', // Tamansari
+                '3511100011', // Pejaten
+            ],
+            25 => [
+                '3511100008', // Kotakulon
+                '3511100006', // Dabasah
+                '3511100009', // Blindungan
+            ],
+        ];
+
+        foreach ($dataPivotDesa as $puskesmas_id => $villages) {
+            foreach ($villages as $village_id) {
+                DB::table('pivot_puskesmas_village')->insert([
+                    'puskesmas_id' => $puskesmas_id,
+                    'village_id' => $village_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
 
         //Inject All NPC
