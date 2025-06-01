@@ -2,9 +2,7 @@
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\admin\dashboard;
 use App\Http\Controllers\artikelController;
 use App\Http\Controllers\posyanduController;
 use App\Http\Controllers\admin\dashboardController;
@@ -27,7 +25,6 @@ Route::get('/storage/artikel/{filename}', function ($filename) {
 Route::get('/download/sipenting', function() {
     return view("downloadAPK");
 });
-
 
 Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {
     Route::get('/', function() {

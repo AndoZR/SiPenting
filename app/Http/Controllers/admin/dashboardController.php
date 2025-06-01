@@ -162,8 +162,20 @@ class dashboardController extends Controller
     public function daftar(Request $request){
         if($request->ajax()) {
             try {
-                $data = User::where('role', 1)->with('village')->get();
-        
+                // Deteksi siapa yang login
+                if (auth('bapeda')->check()) {
+                    $data = User::where('role', 1)->with('village')->get(); // Akses penuh untuk Bapeda
+                } elseif (auth('puskesmas')->check()) {
+                    $puskesmas = auth('puskesmas')->user();
+
+                    $desaIds = villages::where('district_id', $puskesmas->id_district)->pluck('id');
+                    $data = User::where('role', 1)
+                        ->whereIn('id_villages', $desaIds)
+                        ->with('village')
+                        ->get();
+                } else {
+                    return ResponseFormatter::error(null, 'Unauthorized', 401);
+                }
                 return ResponseFormatter::success($data, 'Berhasil Mendapatkan Data Ibu!');
             } catch (Exception $e) {
                 Log::error($e->getMessage());
@@ -197,8 +209,20 @@ class dashboardController extends Controller
     public function daftarAnak(Request $request) {
         if ($request->ajax()) {
             try {
-                // Ambil data bayi beserta relasi user → village → district
-                $data = bayi::with('user.village.district')->get();
+                $data = collect();
+
+                if (auth('bapeda')->check()) {
+                    // Jika login sebagai bapeda, ambil semua anak
+                    $data = Bayi::with('user.village.district')->get();
+                } elseif (auth('puskesmas')->check()) {
+                    // Jika login sebagai puskesmas, ambil anak berdasarkan desa dalam kecamatan yang terkait
+                    $puskesmas = auth('puskesmas')->user();
+                    $desaIds = Villages::where('district_id', $puskesmas->id_district)->pluck('id');
+
+                    $data = Bayi::whereHas('user', function ($query) use ($desaIds) {
+                        $query->whereIn('id_villages', $desaIds);
+                    })->with('user.village.district')->get();
+                }
 
                 return ResponseFormatter::success($data, "Berhasil Mendapatkan Data Anak!");
             } catch (Exception $e) {
@@ -206,8 +230,10 @@ class dashboardController extends Controller
                 return ResponseFormatter::error($e->getMessage(), "Data Gagal Diproses. Kesalahan Server", 500);
             }
         }
+
         return view("admin.anak.daftarAnak");
     }
+
 
     public function detaildGiziAnak($id, Request $request) {
         try {
@@ -257,7 +283,12 @@ class dashboardController extends Controller
     public function daftarKecamatanGizi(Request $request) {
         if($request->ajax()) {
             try{
-                $data = districts::where("regency_id",3511)->get();
+                if (auth('puskesmas')->check()) {
+                    $user = auth('puskesmas')->user();
+                    $data = Districts::where('id', $user->id_district)->get(); // hanya kecamatan puskesmas itu
+                } elseif (auth('bapeda')->check()) {
+                    $data = Districts::where("regency_id", 3511)->get(); // semua kecamatan
+                }
 
                 return ResponseFormatter::success($data, "Berhasil Mendapatkan Data Anak!");
             } catch (Exception $e) {
@@ -340,8 +371,12 @@ class dashboardController extends Controller
     public function daftarKecamatanStunting(Request $request) {
         if($request->ajax()) {
             try{
-                $data = districts::where("regency_id",3511)->get();
-
+                if (auth('puskesmas')->check()) {
+                    $user = auth('puskesmas')->user();
+                    $data = Districts::where('id', $user->id_district)->get();
+                } elseif (auth('bapeda')->check()) {
+                    $data = Districts::where("regency_id", 3511)->get();
+                }
                 return ResponseFormatter::success($data, "Berhasil Mendapatkan Data Anak!");
             } catch (Exception $e) {
                 Log::error($e->getMessage());

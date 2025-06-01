@@ -53,7 +53,8 @@
         </div>
         <div class="sb-sidenav-footer">
             <div class="small">Masuk Sebagai:</div>
-            {{ Auth::guard()->name }}
+            {{-- {{ Auth::guard()->name }} --}}
+            {{ auth()->user()->name ?? auth('puskesmas')->user()->name ?? auth('bapeda')->user()->name ?? 'Tidak Dikenal' }}
         </div>
     </nav>
 </div>

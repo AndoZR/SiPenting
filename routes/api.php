@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\villages;
+use App\Models\akun_puskesmas;
+use App\Helpers\ResponseFormatter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\bayiController;
@@ -8,6 +12,38 @@ use App\Http\Controllers\artikelController;
 use App\Http\Controllers\posyanduController;
 use App\Http\Controllers\kalkulatorGiziController;
 use App\Http\Controllers\kalkulatorStuntingController;
+
+Route::get('/kontak/', function() {
+    $idVillage = Auth::user()->id_villages;
+
+    if (!$idVillage) {
+        return response()->json(['message' => 'ID desa tidak ditemukan'], 400);
+    }
+
+    // Ambil data desa, termasuk kecamatannya
+    $desa = villages::with('district')->where('id', $idVillage)->first();
+
+    if (!$desa || !$desa->district) {
+        return response()->json(['message' => 'Desa atau kecamatan tidak ditemukan'], 404);
+    }
+
+    // Cari puskesmas dengan id_district yang sesuai
+    $puskesmas = akun_puskesmas::where('id_district', $desa->district->id)->first();
+
+    if (!$puskesmas || !$puskesmas->nomor) {
+        return response()->json(['message' => 'Nomor WA tidak ditemukan'], 404);
+    }
+
+    $message = urlencode("Halo Pak/Ibu " . $puskesmas->name . ", Saya dari pengguna Aplikasi Sipenting ingin berkonsultasi.");
+
+    // Format nomor WA: ubah 08xxx menjadi 628xxx
+    $noWa = $puskesmas->nomor;
+    $noWa = preg_replace('/^0/', '62', $noWa); // ganti 0 di awal jadi 62
+
+    $waLink = "https://wa.me/" . $noWa . "?text=" . $message;
+
+    return ResponseFormatter::success($waLink,"Berhasil Mendapatkan Link Whatsapp!");
+});
 
 Route::middleware(['guest'])->group(function () {
     Route::post('login', [AuthController::class, 'login']);

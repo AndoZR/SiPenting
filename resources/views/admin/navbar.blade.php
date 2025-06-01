@@ -18,7 +18,9 @@
                 {{-- <li><a class="dropdown-item" href="#!">Settings</a></li>
                 <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                 <li><hr class="dropdown-divider" /></li> --}}
+                @if (auth('puskesmas')->check())
                 <li><a class="dropdown-item btn-nomor" href="#">Nomor Kontak</a></li>
+                @endif
                 <li><a class="dropdown-item" href="{{ route('logout-web') }}">Logout</a></li>
             </ul>
         </li>
