@@ -87,7 +87,7 @@
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
                         var id = data.id;
-                        var url1 = `{{ route('anak.anak.ekspor-excel', ['village_id' => ':id']) }}`;
+                        var url1 = `{{ route('anak.ekspor-excel-desa', ['village_id' => ':id']) }}`;
                         url1 = url1.replace(':id', id);
                         $button = `<a href="${url1}" class="btn btn-success btn-edit" title="Ekspor Excel">Ekspor</a>`;
                         return $button;

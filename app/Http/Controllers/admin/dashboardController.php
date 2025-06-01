@@ -8,6 +8,8 @@ use App\Models\bayi;
 use App\Models\User;
 use App\Models\villages;
 use App\Models\districts;
+use App\Models\hist_gizi;
+use App\Models\hist_stun;
 use App\Exports\ExportData;
 use Illuminate\Http\Request;
 use App\Models\akun_puskesmas;
@@ -15,8 +17,7 @@ use App\Helpers\ResponseFormatter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\hist_gizi;
-use App\Models\hist_stun;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
@@ -25,6 +26,34 @@ class dashboardController extends Controller
 {
     public function index(){
         return view("admin.home");
+    }
+
+    public function gantiNomorPuskesmas(Request $request){
+        $id = Auth::user()->id;
+        $validator = Validator::make($request->all(), [
+            'nomor' => 'string|regex:/^[0-9]{10,15}$/|unique:akun_puskesmas,nomor,' . $id,
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(null,$validator->errors(),422);
+        };
+
+        try{
+            $hashPassword = Hash::make($request->password);
+            $data = akun_puskesmas::find($id); 
+            $updateData = [
+                'nomor' => $request->nomor,
+            ];
+
+            // Update data
+            $data->update($updateData);
+
+            return ResponseFormatter::success($data,"Berhasil Mengubah Data Akun Puskesmas!");
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
+        }
+        return view('admin.home');
     }
 
     public function viewAkunPuskesmas(Request $request){
@@ -116,6 +145,17 @@ class dashboardController extends Controller
             return ResponseFormatter::error($e->getMessage(), "Data gagal diproses. Kesalahan Server", 500);
         }
         return view('admin.akunPuskesmas');
+    }
+
+    public function hapusAkunPuskesmas($id) {
+        try{
+            $data = akun_puskesmas::find($id);
+            $data->delete();
+            return ResponseFormatter::success("Data Artikel Berhasil Dihapus!");
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ResponseFormatter::error($e->getMessage(), "Data gagal dihapus. Kesalahan Server", 500);
+        }
     }
 
     // fitur data ibu
@@ -213,6 +253,7 @@ class dashboardController extends Controller
         }
     }
 
+    // GIZI DAERAH
     public function daftarKecamatanGizi(Request $request) {
         if($request->ajax()) {
             try{
@@ -225,6 +266,12 @@ class dashboardController extends Controller
             }
         }
         return view("admin.anak.giziKecamatan");
+    }
+
+    public function eksporExcelKecamatan($kecamatan_id) {
+        // Export berdasarkan kecamatan
+        $nama = districts::find($kecamatan_id)?->name;
+        return Excel::download(new ExportData($kecamatan_id, 'kecamatan', 'gizi'), 'data-gizi-kecamatan-' . $nama . '.xlsx');
     }
 
     public function graphGiziAnak($id, Request $request){
@@ -283,10 +330,13 @@ class dashboardController extends Controller
         return view("admin.anak.giziDesa",["id" => $id]);
     }
 
-    public function eksporExcel($village_id, Request $request){
-        return Excel::download(new ExportData($village_id), 'data-anak-desa.xlsx');
+    public function eksporExcelDesa($village_id, Request $request)
+    {
+        $nama = villages::find($village_id)?->name;
+        return Excel::download(new ExportData($village_id, 'desa', 'gizi'), 'data-gizi-desa-' . $nama . '.xlsx');
     }
 
+    // STUNTING DAERAH
     public function daftarKecamatanStunting(Request $request) {
         if($request->ajax()) {
             try{
@@ -299,6 +349,12 @@ class dashboardController extends Controller
             }
         }
         return view("admin.anak.stuntingKecamatan");
+    }
+
+    public function eksporExcelStuntKecamatan($kecamatan_id) {
+        // Export berdasarkan kecamatan
+        $nama = districts::find($kecamatan_id)?->name;
+        return Excel::download(new ExportData($kecamatan_id, 'kecamatan', 'stunting'), 'data-stunting-kecamatan-' . $nama . '.xlsx');
     }
 
     public function graphStuntingAnak($district_id) {
@@ -387,6 +443,12 @@ class dashboardController extends Controller
             }
         }
         return view("admin.anak.stuntingDesa",["id" => $id]);
+    }
+
+    public function eksporExcelStuntDesa($village_id, Request $request)
+    {
+        $nama = villages::find($village_id)?->name;
+        return Excel::download(new ExportData($village_id, 'desa', 'stunting'), 'data-stunting-desa-' . $nama . '.xlsx');
     }
 
 

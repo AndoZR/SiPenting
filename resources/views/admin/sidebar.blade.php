@@ -12,7 +12,7 @@
                     Artikel
                 </a>
                 @if (auth('bapeda')->check())
-                <a class="nav-link" href="{{ route('akun_puskesmas.viewAkunPuskesmas') }}">
+                <a class="nav-link" href="{{ route('bapeda.viewAkunPuskesmas') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Akun Puskesmas
                 </a>

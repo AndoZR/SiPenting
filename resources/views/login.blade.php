@@ -17,7 +17,7 @@
 
     <!-- Tombol Role -->
     <div class="d-flex flex-column px-3 mt-4">
-        <span class="mb-2 text-muted text-center">Pilih Role Admin Sebagai:</span>
+        <span class="mb-2 text-muted text-center">Admin Sebagai:</span>
         <div class="d-flex justify-content-between" style="gap: 1rem;">
             <button type="button" class="btn role-btn active" id="btn-bapeda">Bapeda</button>
             <button type="button" class="btn role-btn inactive" id="btn-puskesmas">Puskesmas</button>

@@ -38,14 +38,22 @@ Route::middleware(['guest:bidan,puskesmas,bapeda,dinkes'])->group(function() {
     Route::post('/login/puskesmas', [AuthController::class, 'loginPuskesmas'])->name('login-web-puskesmas');
 });
 
+// ONLY BAPEDA OTORITY
 Route::middleware(['auth:bapeda','check'])->group(function() {
-    Route::group(['prefix' => 'akun_puskesmas', 'as' => 'akun_puskesmas.'], function () {
+    Route::group(['prefix' => 'bapeda', 'as' => 'bapeda.'], function () {
         Route::get('/', [dashboardController::class, 'viewAkunPuskesmas'])->name('viewAkunPuskesmas');
         Route::post('/changePassword/{id}', [dashboardController::class, 'changePassword'])->name('changePassword');
         Route::post('/tambah', [dashboardController::class, 'addPuskesmas'])->name('addPuskesmas');
+        Route::get('/hapus/akun/{id}', [dashboardController::class, 'hapusAkunPuskesmas'])->name('hapus-akun-puskesmas');
     });
 });
 
+// ONLY PUSKESMAS OTORITY
+Route::middleware(['auth:puskesmas','check'])->group(function() {
+    Route::group(['prefix' => 'puskesmas', 'as' => 'puskesmas.'], function () {
+        Route::post('/ganti/nomor', [dashboardController::class, 'gantiNomorPuskesmas'])->name('ganti-Nomor-Puskesmas');
+    });
+});
 
 Route::middleware(['auth:bidan,puskesmas,bapeda','check'])->group(function() {
     Route::get('/home', [dashboardController::class, 'index'])->name('home');
@@ -68,13 +76,16 @@ Route::middleware(['auth:bidan,puskesmas,bapeda','check'])->group(function() {
         Route::get('/daftar/detail-stunting-anak/{id}', [dashboardController::class, 'detaildStuntingAnak'])->name('detail-stunting-anak');
         
         Route::get('/giziKecamatan', [dashboardController::class, 'daftarKecamatanGizi'])->name('daftar-kecamatan-gizi');
+        Route::get('/giziKecamatan/export/{kecamatan_id}', [dashboardController::class, 'eksporExcelKecamatan'])->name('ekspor-excel-kecamatan');
         Route::get('/grafikGiziAnak/{id}', [dashboardController::class, 'graphGiziAnak'])->name('graph-gizi-anak');
         Route::get('/giziDesa/{id}', [dashboardController::class, 'daftarDesaGizi'])->name('daftar-desa-gizi');
-        Route::get('/anak/export/village/{village_id}', [dashboardController::class, 'eksporExcel'])->name('anak.ekspor-excel');
+        Route::get('/giziDesa/export/{village_id}', [dashboardController::class, 'eksporExcelDesa'])->name('ekspor-excel-desa');
         
         Route::get('/stuntingKecamatan', [dashboardController::class, 'daftarKecamatanStunting'])->name('daftar-kecamatan-stunting');
+        Route::get('/stuntingKecamatan/export/{kecamatan_id}', [dashboardController::class, 'eksporExcelStuntKecamatan'])->name('ekspor-excel-stunt-kecamatan');
         Route::get('/grafikStuntingAnak/{id}', [dashboardController::class, 'graphStuntingAnak'])->name('graph-stunting-anak');
-        Route::get('/giziStunting/{id}', [dashboardController::class, 'daftarDesaStunting'])->name('daftar-desa-stunting');
+        Route::get('/stuntingDesa/{id}', [dashboardController::class, 'daftarDesaStunting'])->name('daftar-desa-stunting');
+        Route::get('/stuntingDesa/export/{village_id}', [dashboardController::class, 'eksporExcelStuntDesa'])->name('ekspor-excel-stunt-desa');
     });
 
     Route::get('/logout', [AuthController::class, 'logoutWeb'])->name('logout-web');

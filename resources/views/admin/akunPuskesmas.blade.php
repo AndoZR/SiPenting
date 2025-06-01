@@ -151,7 +151,7 @@
 
         var idAkunPuskesmas;
         let url;
-        let urlView = '{{ route('akun_puskesmas.viewAkunPuskesmas') }}';
+        let urlView = '{{ route('bapeda.viewAkunPuskesmas') }}';
 
         let tableAkunPuskesmas = $('#table-akun-puskesmas').DataTable({
             paging: true,
@@ -216,7 +216,8 @@
                     data: null,
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
-                        $button = `<button class="btn btn-warning btn-pw" title="Ubah">Ubah Akun</button>`;
+                        $button = `<button class="btn btn-warning btn-pw" title="Ubah">Ubah</button>
+                        <button class="btn btn-danger btn-hapus" title="Hapus">Hapus</button>`;
                         return $button;
                     }
                 },
@@ -242,10 +243,10 @@
             e.preventDefault();
 
             if(idAkunPuskesmas !== undefined){
-                url = "{{ route('akun_puskesmas.changePassword', ['id' => ':id']) }}";
+                url = "{{ route('bapeda.changePassword', ['id' => ':id']) }}";
                 url = url.replace(':id', idAkunPuskesmas)
             }else{
-                url = "{{ route('akun_puskesmas.addPuskesmas') }}";
+                url = "{{ route('bapeda.addPuskesmas') }}";
             }
 
             var formData = new FormData($("#form-akun")[0]);
@@ -296,76 +297,58 @@
             });
         });
 
-        // Submit Form Create art
-        // $('#form-akun').submit(function(e) {
-        //     e.preventDefault();
-        //     url = "{{ route('akun_puskesmas.changePassword', ['id' => ':id']) }}";
-        //     url = url.replace(':id', idAkunPuskesmas)
+        // Hapus Data
+        $('#table-akun-puskesmas tbody').on('click', '.btn-hapus', function() {
+            var data = tableAkunPuskesmas.row($(this).parents('tr')).data();
+            let urlDestroy = "{{ route('bapeda.hapus-akun-puskesmas', ['id' => ':id']) }}"
+            urlDestroy = urlDestroy.replace(':id', data.id);
 
-        //     // Ambil nilai dari input
-        //     var pw = $('#pw').val();
-        //     var confirmPw = $('#confirm_pw').val();
-
-        //     // Reset pesan error sebelumnya
-        //     $('.pw_error').text('');
-        //     $('.confirm_pw_error').text('');
-        //     $('#pw, #confirm_pw').removeClass('is-invalid');
-
-        //     // Cek kecocokan password
-        //     if (pw !== confirmPw) {
-        //         // Tampilkan error
-        //         $('#confirm_pw').addClass('is-invalid');
-        //         $('.confirm_pw_error').text('Password tidak cocok.');
-        //         return; // Hentikan proses submit
-        //     }
-
-        //     var formData = new FormData($("#form-akun")[0]);
-
-        //     $.ajax({
-        //         type: "POST",
-        //         url: url,
-        //         data: formData,
-        //         processData: false,
-        //         contentType: false,
-        //         beforeSend: function() {
-        //             $('*').removeClass('is-invalid');
-        //         },
-        //         success: function(response) {
-        //             $('#modal-akun').modal('hide');
-        //             Swal.fire({
-        //                 icon: 'success',
-        //                 title: 'Berhasil Tersimpan!',
-        //                 text: response.meta.message,
-        //             });
-        //             tableAkunPuskesmas.ajax.reload();
-        //         },
-        //         error: function(xhr, ajaxOptions, thrownError) {
-        //             switch (xhr.status) {
-        //                 case 422:
-        //                 var errors = xhr.responseJSON.meta.message;
-        //                 var message = '';
-        //                 $.each(errors, function(key, value) {
-        //                     message = value;
-        //                     $('*[name="' + key + '"]').addClass('is-invalid');
-        //                     $('.invalid-feedback.' + key + '_error').html(value);
-        //                 });
-        //                 Swal.fire({
-        //                     icon: 'error',
-        //                     title: 'Gagal!',
-        //                     text: message,
-        //                 })
-        //                 break;
-        //                 default:
-        //                 Swal.fire({
-        //                     icon: 'error',
-        //                     title: 'Gagal!',
-        //                     text: 'Terjadi kesalahan, Kesalahan Server!',
-        //                 })
-        //                 break;
-        //             }
-        //         }
-        //     });
-        // });
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                $.ajax({
+                    type: "GET",
+                    url: urlDestroy,
+                    beforeSend: function() {
+                    },
+                    success: function(data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Data berhasil dihapus!',
+                    })
+                    tableAkunPuskesmas.ajax.reload();
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                    switch (xhr.status) {
+                        case 500:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Server Error!',
+                        })
+                        break;
+                        default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan!',
+                        })
+                        break;
+                    }
+                    }
+                });
+                }
+            });
+        });
     })
 </script>
 @endpush

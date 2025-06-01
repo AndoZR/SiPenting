@@ -18,8 +18,115 @@
                 {{-- <li><a class="dropdown-item" href="#!">Settings</a></li>
                 <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                 <li><hr class="dropdown-divider" /></li> --}}
+                <li><a class="dropdown-item btn-nomor" href="#">Nomor Kontak</a></li>
                 <li><a class="dropdown-item" href="{{ route('logout-web') }}">Logout</a></li>
             </ul>
         </li>
     </ul>
 </nav>
+
+<!-- Modal Create Artikel -->
+<div class="modal fade" id="modal-nomor" tabindex="-1" role="dialog" aria-labelledby="modalCreate" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ganti Nomor Kontak</h5>
+        </div>
+        <form id="form-ganti-nomor">
+          @csrf
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="nomor">Nomor Kontak <span class="text-danger">*</span></label>
+                  <input value="{{ Auth::user()->nomor }}" type="text" class="form-control" name="nomor" id="nomor" placeholder="Silahkan Ganti Nomor Sesuai" autofocus autocomplete="off" value="{{ Auth::user()->nomor }}">
+                  <div class="invalid-feedback nomor_error"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn" data-bs-dismiss="modal">
+                  <i class="bx bx-x d-block d-sm-none"></i>
+                  <span class="d-none d-sm-block">Batal</span>
+              </button>
+              <button type="submit" class="btn btn-primary ms-1">
+                  <i class="bx bx-check d-block d-sm-none"></i>
+                  <span class="d-none d-sm-block">Simpan</span>
+              </button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Event delegation to handle clicks on dynamically generated buttons
+        $(document).on('click', '.btn-nomor', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+            
+            $('#modal-nomor').modal('show'); // Show the modal
+        });
+
+        // Submit Form Create art
+        $('#form-ganti-nomor').submit(function(e) {
+            e.preventDefault();
+            url = "{{ route('puskesmas.ganti-Nomor-Puskesmas') }}";
+
+            var formData = new FormData($("#form-ganti-nomor")[0]);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $('*').removeClass('is-invalid');
+                },
+                success: function(response) {
+                    $('#modal-nomor').modal('hide');
+                    // Update nilai input dan tombol dengan data baru
+                    if (response.data && response.data.nomor) {
+                        $('#nomor').val(response.data.nomor);
+
+                        // Update tombol dengan nomor terbaru (supaya klik selanjutnya ambil yang baru)
+                        $('.btn-nomor').attr('data-nomor', response.data.nomor);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil Tersimpan!',
+                        text: response.meta.message,
+                    });
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    switch (xhr.status) {
+                        case 422:
+                        var errors = xhr.responseJSON.meta.message;
+                        var message = '';
+                        $.each(errors, function(key, value) {
+                            message = value;
+                            $('*[name="' + key + '"]').addClass('is-invalid');
+                            $('.invalid-feedback.' + key + '_error').html(value);
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: message,
+                        })
+                        break;
+                        default:
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan!',
+                        })
+                        break;
+                    }
+                }
+            });
+        })
+    })
+</script>

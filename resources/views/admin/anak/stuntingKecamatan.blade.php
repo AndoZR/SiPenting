@@ -25,7 +25,6 @@
                         <tr>
                             <th>No.</th>
                             <th>Kecamatan</th>
-                            <th>Grafik</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -85,23 +84,25 @@
                     data: null,
                     className: 'text-center align-middle',
                     render: function(data, type, row, meta) {
-                        var id = data.id;
-                        var url1 = `{{ route('anak.graph-stunting-anak', ['id' => ':id']) }}`;
-                        url1 = url1.replace(':id', id);
-                        $button = `<a href="${url1}" class="btn btn-success btn-edit" title="Grafik Stunting">Grafik</a>`;
-                        return $button;
-                    }
-                },
-                {
-                    targets: 3,
-                    data: null,
-                    className: 'text-center align-middle',
-                    render: function(data, type, row, meta) {
-                        var id = data.id;
-                        var url1 = `{{ route('anak.daftar-desa-stunting', ['id' => ':id']) }}`;
-                        url1 = url1.replace(':id', id);
-                        $button = `<a href="${url1}" class="btn btn-warning btn-edit" title="Lihat Desa">Lihat Desa</a>`;
-                        return $button;
+                        const id = data.id;
+
+                        const routes = {
+                            grafik: `{{ route('anak.graph-stunting-anak', ['id' => ':id']) }}`,
+                            ekspor: `{{ route('anak.ekspor-excel-stunt-kecamatan', ['kecamatan_id' => ':id']) }}`,
+                            desa: `{{ route('anak.daftar-desa-stunting', ['id' => ':id']) }}`
+                        };
+
+                        const urls = {
+                            grafik: routes.grafik.replace(':id', id),
+                            ekspor: routes.ekspor.replace(':id', id),
+                            desa: routes.desa.replace(':id', id)
+                        };
+
+                        return `
+                            <a href="${urls.grafik}" class="btn btn-success" title="Grafik Gizi">Grafik</a>
+                            <a href="${urls.ekspor}" class="btn btn-info" title="Ekspor Data">Excel</a>
+                            <a href="${urls.desa}" class="btn btn-warning" title="Lihat Desa">Desa</a>
+                        `;
                     }
                 },
             ],
