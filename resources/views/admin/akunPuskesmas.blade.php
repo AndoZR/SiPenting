@@ -165,6 +165,21 @@
             $('*').removeClass('is-invalid');
             $('.custom-file-label').html('Pilih file...');
             idAkunPuskesmas = undefined;
+
+            const desaContainer = document.getElementById('desa-container');
+            const desaSelect = document.getElementById('desa');
+
+            // Sembunyikan container
+            desaContainer.style.display = 'none';
+
+            // Kosongkan isi select desa
+            desaSelect.innerHTML = '';
+
+            // Hapus instance Choices jika ada
+            if (desaChoices) {
+                desaChoices.destroy();
+                desaChoices = null;
+            }
         });
 
         const desaBondowosoRaw = @json($dataDesaBondowoso);

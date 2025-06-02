@@ -117,6 +117,24 @@ class dashboardController extends Controller
             ]);
 
             if ($request->kec == '3511100') {
+                // Cek apakah ada desa yang sudah dipakai oleh Puskesmas lain
+                $desaTerpakai = DB::table('pivot_puskesmas_village')
+                    ->whereIn('village_id', $request->desa)
+                    ->pluck('village_id')
+                    ->toArray();
+
+                if (!empty($desaTerpakai)) {
+                    $namaDesaTerpakai = DB::table('villages')
+                        ->whereIn('id', $desaTerpakai)
+                        ->pluck('name')
+                        ->toArray();
+
+                    return ResponseFormatter::error(null, [
+                        'desa' => ['Desa berikut sudah digunakan oleh Puskesmas lain: ' . implode(', ', $namaDesaTerpakai)]
+                    ], 422);
+                }
+
+                // Insert desa baru
                 foreach ($request->desa as $village_id) {
                     DB::table('pivot_puskesmas_village')->insert([
                         'puskesmas_id' => $data->id,
@@ -124,6 +142,7 @@ class dashboardController extends Controller
                     ]);
                 }
             }
+
 
             return ResponseFormatter::success($data,"Berhasil Menambah Data Akun Puskesmas!");
         } catch (Exception $e) {
@@ -170,6 +189,19 @@ class dashboardController extends Controller
 
             // Update desa pivot table
             if ($request->kec == '3511100') {
+                // Cek apakah ada desa yang sudah dipakai oleh Puskesmas lain
+                $desaTerpakai = DB::table('pivot_puskesmas_village')
+                    ->whereIn('village_id', $request->desa)
+                    ->where('puskesmas_id', '!=', $id)
+                    ->pluck('village_id')
+                    ->toArray();
+
+                if (!empty($desaTerpakai)) {
+                    return ResponseFormatter::error(null, [
+                        'desa' => ['Beberapa desa sudah digunakan oleh Puskesmas lain.']
+                    ], 422);
+                }
+
                 // Hapus desa lama dulu
                 DB::table('pivot_puskesmas_village')->where('puskesmas_id', $id)->delete();
 
@@ -184,6 +216,7 @@ class dashboardController extends Controller
                 // Jika kecamatan bukan 3511100, hapus desa pivot yang mungkin ada
                 DB::table('pivot_puskesmas_village')->where('puskesmas_id', $id)->delete();
             }
+
 
             return ResponseFormatter::success($data,"Berhasil Mengubah Data Akun Puskesmas!");
         } catch (Exception $e) {
