@@ -59,7 +59,8 @@ class dashboardController extends Controller
     public function viewAkunPuskesmas(Request $request){
         if($request->ajax()) {
             try{
-                $dataAkun = akun_puskesmas::with('districts')->get();
+                // $dataAkun = akun_puskesmas::with('districts')->get();
+                $dataAkun = akun_puskesmas::with(['districts', 'villages'])->get();
 
                 return ResponseFormatter::success($dataAkun,"Berhasil Mendapatkan Data Akun!");
             } catch (Exception $e) {
@@ -68,7 +69,8 @@ class dashboardController extends Controller
             }
         }
         $dataKecamatan = districts::where("regency_id",3511)->get();
-        return view('admin.akunPuskesmas', ["dataKecamatan" => $dataKecamatan]);
+        $dataDesaBondowoso = villages::where("district_id",3511100)->get();
+        return view('admin.akunPuskesmas', ["dataKecamatan" => $dataKecamatan,"dataDesaBondowoso" => $dataDesaBondowoso]);
     }
 
     public function addPuskesmas(Request $request) {
@@ -79,6 +81,15 @@ class dashboardController extends Controller
             'password' => 'required|string|min:8|max:100',
             'confirm_password' => 'required|same:password',
         ]);
+
+        // Jika kecamatan Bondowoso (3511100), tambahkan validasi desa
+        if ($request->kec == '3511100') {
+            $validator->after(function ($validator) use ($request) {
+                if (empty($request->desa) || !is_array($request->desa)) {
+                    $validator->errors()->add('desa', 'Minimal pilih satu desa.');
+                }
+            });
+        }
 
         if ($validator->fails()) {
             return ResponseFormatter::error(null,$validator->errors(),422);
@@ -105,6 +116,15 @@ class dashboardController extends Controller
                 'password' => $hashPassword,
             ]);
 
+            if ($request->kec == '3511100') {
+                foreach ($request->desa as $village_id) {
+                    DB::table('pivot_puskesmas_village')->insert([
+                        'puskesmas_id' => $data->id,
+                        'village_id' => $village_id
+                    ]);
+                }
+            }
+
             return ResponseFormatter::success($data,"Berhasil Menambah Data Akun Puskesmas!");
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -122,6 +142,15 @@ class dashboardController extends Controller
             'confirm_password' => 'same:password|nullable',
         ]);
 
+        // Jika kecamatan Bondowoso (3511100), tambahkan validasi desa
+        if ($request->kec == '3511100') {
+            $validator->after(function ($validator) use ($request) {
+                if (empty($request->desa) || !is_array($request->desa)) {
+                    $validator->errors()->add('desa', 'Minimal pilih satu desa.');
+                }
+            });
+        }
+
         if ($validator->fails()) {
             return ResponseFormatter::error(null,$validator->errors(),422);
         };
@@ -138,6 +167,23 @@ class dashboardController extends Controller
 
             // Update data
             $data->update($updateData);
+
+            // Update desa pivot table
+            if ($request->kec == '3511100') {
+                // Hapus desa lama dulu
+                DB::table('pivot_puskesmas_village')->where('puskesmas_id', $id)->delete();
+
+                // Insert desa baru
+                foreach ($request->desa as $village_id) {
+                    DB::table('pivot_puskesmas_village')->insert([
+                        'puskesmas_id' => $id,
+                        'village_id' => $village_id
+                    ]);
+                }
+            } else {
+                // Jika kecamatan bukan 3511100, hapus desa pivot yang mungkin ada
+                DB::table('pivot_puskesmas_village')->where('puskesmas_id', $id)->delete();
+            }
 
             return ResponseFormatter::success($data,"Berhasil Mengubah Data Akun Puskesmas!");
         } catch (Exception $e) {

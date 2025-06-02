@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('puskesmas_id');
             $table->string('village_id'); // karena id desa format string seperti '3511100001'
-            $table->timestamps();
 
             // Foreign key constraints (jika tabel puskesmas dan villages sudah ada)
             $table->foreign('puskesmas_id')->references('id')->on('akun_puskesmas')->onDelete('cascade');

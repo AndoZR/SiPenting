@@ -24,13 +24,17 @@ class akun_puskesmas extends Model
         return $this->belongsTo(districts::class, 'id_district');
     }
 
-    public function pivot_puskesmas_village() {
-        return $this->hasMany(pivot_puskesmas_village::class, 'id_district');
+    // Relasi pivot sebagai model (optional)
+    public function pivot_puskesmas_village()
+    {
+        return $this->hasMany(pivot_puskesmas_village::class, 'puskesmas_id');
     }
 
+    // Relasi many-to-many villages langsung
     public function villages()
     {
-        return $this->belongsToMany(Villages::class, 'pivot_puskesmas_village', 'puskesmas_id', 'village_id');
+        return $this->belongsToMany(villages::class, 'pivot_puskesmas_village', 'puskesmas_id', 'village_id')
+                    ->withPivot('puskesmas_id', 'village_id'); // optional
     }
 
 }

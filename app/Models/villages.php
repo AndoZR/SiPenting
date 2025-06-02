@@ -35,6 +35,4 @@ class villages extends Model
     {
         return $this->belongsToMany(akun_puskesmas::class, 'pivot_puskesmas_village', 'village_id', 'puskesmas_id');
     }
-
-
 }

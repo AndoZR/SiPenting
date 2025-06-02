@@ -49,7 +49,7 @@
     </div>
 </main>
 
-<!-- Modal Ganti Password -->
+<!-- Modal add and ganti Password -->
 <div class="modal fade" id="modal-akun" tabindex="-1" role="dialog" aria-labelledby="modalCreate" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -93,6 +93,18 @@
                 </div>
               </div>
             </div>
+
+            <div class="row" id="desa-container" style="display: none;">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="desa">Desa <span class="text-danger">*</span></label>
+                        <select class="form-select" name="desa[]" id="desa" multiple></select>
+                        <div class="invalid-feedback desa_error"></div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="row">
               <div class="col-12">
                 <label for="password">Password <span class="text-danger">*</span></label>
@@ -130,13 +142,21 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('src/admin/js/datatables-simple-demo.js') }}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- CSS Choices -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+<!-- JS Choices -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
 
 {{-- <script src="{{ asset('src/compiled/js/app.js') }}"></script> --}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.1/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.0.0/js/dataTables.buttons.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.dataTables.js"></script>
+
+<script src="{{ asset('src/admin/js/datatables-simple-demo.js') }}"></script>
 
 <script>
     $(document).ready(function () {
@@ -146,6 +166,20 @@
             $('.custom-file-label').html('Pilih file...');
             idAkunPuskesmas = undefined;
         });
+
+        const desaBondowosoRaw = @json($dataDesaBondowoso);
+        const desaBondowoso = desaBondowosoRaw.map(d => ({
+            value: d.id,
+            label: d.name
+        }));
+
+        let desaChoices = null;
+
+        document.getElementById('kec').addEventListener('change', function () {
+            const selectedKec = this.value;
+            initDesaChoices(selectedKec);
+        });
+
 
         const dataKecamatan = @json($dataKecamatan);
 
@@ -229,11 +263,18 @@
             var data = tableAkunPuskesmas.row($(this).parents('tr')).data();
             idAkunPuskesmas = data.id;
 
-            // set form action
+            // set nilai form
             $('input[name="nama"]').val(data.name);
-            $('#kec').val(data.districts.id); // akan memilih option dengan value sesuai id kecamatan
             $('input[name="nomor"]').val(data.nomor);
+            $('#kec').val(data.districts.id)
 
+            // Ambil ID kecamatan dan desa terpilih
+            const districtId = data.districts.id;
+            const desaTerpilih = data.villages.map(v => v.id.toString());
+
+            // Inisialisasi desa berdasarkan kecamatan yang dimiliki data
+            initDesaChoices(districtId, desaTerpilih);
+            
             // show modal
             $('#modal-akun').modal('show');
         });
@@ -349,6 +390,58 @@
                 }
             });
         });
+
+        function initDesaChoices(kecamatanId, desaTerpilih = []) {
+            const desaContainer = document.getElementById('desa-container');
+            const desaElement = document.getElementById('desa');
+
+            if (kecamatanId === '3511100' || kecamatanId === 3511100) {
+                desaContainer.style.display = 'block';
+
+                desaElement.innerHTML = '';
+
+                if (desaChoices) {
+                    desaChoices.destroy();
+                }
+
+                // Tambahkan pilihan desa
+                desaBondowoso.forEach(desa => {
+                    const opt = document.createElement('option');
+                    opt.value = desa.value;
+                    opt.text = desa.label;
+                    if (desaTerpilih.includes(desa.value.toString())) {
+                        opt.selected = true;
+                    }
+                    desaElement.appendChild(opt);
+                });
+
+                desaChoices = new Choices(desaElement, {
+                    removeItemButton: true,
+                    placeholder: true,
+                    placeholderValue: 'Pilih desa',
+                    noResultsText: 'Tidak ada desa',
+                    itemSelectText: 'Klik untuk pilih',
+                    shouldSort: false
+                });
+
+                desaChoices.setChoices(
+                    Array.from(desaElement.options).map(opt => ({
+                        value: opt.value,
+                        label: opt.text,
+                        selected: opt.selected
+                    })),
+                    'value',
+                    'label',
+                    true
+                );
+            } else {
+                desaContainer.style.display = 'none';
+                if (desaChoices) {
+                    desaChoices.destroy();
+                    desaChoices = null;
+                }
+            }
+        }
     })
 </script>
 @endpush

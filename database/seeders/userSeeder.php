@@ -120,8 +120,6 @@ class userSeeder extends Seeder
                 DB::table('pivot_puskesmas_village')->insert([
                     'puskesmas_id' => $puskesmas_id,
                     'village_id' => $village_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
         }
