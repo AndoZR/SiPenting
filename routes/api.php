@@ -41,7 +41,6 @@ Route::get('/kontak/', function() {
         $puskesmas = akun_puskesmas::where('id_district', $desa->district->id)->first();
     }
 
-
     if (!$puskesmas || !$puskesmas->nomor) {
         return response()->json(['message' => 'Nomor WA tidak ditemukan'], 404);
     }
