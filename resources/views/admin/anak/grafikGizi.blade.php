@@ -38,80 +38,109 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        const labels = @json($labels);
+$(document).ready(function () {
+    const labels = @json($labels);
 
-        // Warna yang bisa dipakai, sesuaikan sendiri jika mau
-        const CHART_COLORS = [
-            'rgb(255, 99, 132)',   // merah
-            'rgb(54, 162, 235)',   // biru
-            'rgb(75, 192, 192)',   // hijau
-            'rgb(153, 102, 255)',  // ungu
-            'rgb(255, 159, 64)',   // oranye
-            'rgb(54, 162, 135)',   // teal
-            'rgb(0, 255, 255)',    // cyan
-            'rgb(255, 0, 255)',    // magenta
-            'rgb(165, 42, 42)',    // coklat
-            'rgb(201, 203, 207)'   // abu-abu
-        ];
+    const CHART_COLORS = [
+        'rgba(255, 99, 132, 0.3)',   // merah pastel
+        'rgba(54, 162, 235, 0.3)',   // biru pastel
+        'rgba(75, 192, 192, 0.3)',   // hijau pastel
+        'rgba(255, 205, 86, 0.3)',   // kuning pastel
+        'rgba(153, 102, 255, 0.3)',  // ungu pastel
+    ];
 
-        // Fungsi buat warna background dengan alpha
-        function transparentize(color, opacity = 0.5) {
-            // expects color like 'rgb(r, g, b)'
-            return color.replace('rgb', 'rgba').replace(')', `, ${opacity})`);
-        }
+    const datasets = @json($datasets).map((ds, i) => ({
+        label: ds.label,
+        data: ds.data,
+        backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
+        borderColor: CHART_COLORS[i % CHART_COLORS.length].replace('0.3', '1'),
+        borderWidth: 1,
+        borderRadius: 8,
+        barPercentage: 0.7,
+        categoryPercentage: 0.5,
+    }));
 
-        // Build datasets dengan warna
-        const datasets = @json($datasets).map((ds, i) => {
-            const color = CHART_COLORS[i % CHART_COLORS.length];
-            return {
-                label: ds.label,
-                data: ds.data,
-                borderColor: color,
-                backgroundColor: transparentize(color, 0.2),
-                pointBackgroundColor: color,
-                fill: true
-            };
-        });
-
-        const data = {
+    const config = {
+        type: 'bar',
+        data: {
             labels: labels,
             datasets: datasets
-        };
-
-        const config = {
-            type: 'radar',
-            data: data,
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Radar Gizi Anak per Desa'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const datasetLabel = context.dataset.label || '';
-                                const labelName = context.label || context.chart.data.labels[context.dataIndex];
-                                const value = context.raw !== undefined ? context.raw : context.parsed;
-                                return `${labelName} (${datasetLabel}): ${value}`;
-                            }
-                        }
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: { top: 20, bottom: 20 }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Rata-rata Gizi Anak per Desa',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
                     }
                 },
-                scales: {
-                    r: {
-                        angleLines: { display: true },
-                        suggestedMin: 0,
-                        suggestedMax: 3
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    callbacks: {
+                        label: function (context) {
+                            const value = context.raw?.toFixed(2);
+                            let kategori = '';
+                            if (value < 1.5) kategori = 'Kurang';
+                            else if (value < 2.5) kategori = 'Normal';
+                            else kategori = 'Berlebihan';
+                            return `${context.dataset.label}: ${value} (${kategori})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Kategori Gizi'
+                    },
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
+                },
+                y: {
+                    min: 1,
+                    max: 3,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function (value) {
+                            const map = { 1: 'Kurang', 2: 'Normal', 3: 'Berlebihan' };
+                            return map[value] ?? '';
+                        },
+                        font: { size: 12 }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Status Gizi'
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)',
+                        borderDash: [5, 5],
+                        drawBorder: false, // biar bar gak nempel di border
                     }
                 }
             }
-        };
+        }
+    };
 
-        const ctx = document.getElementById('giziRadarChart').getContext('2d');
-        new Chart(ctx, config);
-    });
+    const ctx = document.getElementById('giziRadarChart').getContext('2d');
+    new Chart(ctx, config);
+});
+
+
 </script>
 @endpush

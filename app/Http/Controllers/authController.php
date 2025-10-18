@@ -55,15 +55,17 @@ class AuthController extends Controller
         // Ambil hanya username dari request
         $username = request('username');
 
-        if(preg_match('/^3511/', $username)){
+        // if(preg_match('/^3511/', $username)){ // sementara comment untuk pengujian
+        if($username){
             // Cek jika username warga bondowoso ada di database
             $user = User::where('username', $username)->first();
         }elseif (empty($username)) {
             // cek guest -> idnya 7 di database user '1919191919191919' sebagai default
             $user = User::where('username', '1919191919191919')->first();
-        }else{
-            return ResponseFormatter::error(null,"Aplikasi ini hanya dapat digunakan oleh warga Bondowoso, harap gunakan guest mode untuk mengakses aplikasi kalkulator gizi, stunting, dan juga informasi terkait stunting!",422);
         }
+        // else{
+        //     return ResponseFormatter::error(null,"Aplikasi ini hanya dapat digunakan oleh warga Bondowoso, harap gunakan guest mode untuk mengakses aplikasi kalkulator gizi, stunting, dan juga informasi terkait stunting!",422);
+        // }
     
         if (!$user) {
             return ResponseFormatter::error(null,"Pengguna Tidak Ditemukan, Pastikan Username Anda Benar!",422);
@@ -135,12 +137,12 @@ class AuthController extends Controller
                     'integer',
                     'digits:16',
                     'unique:users,nik',
-                    function ($attribute, $value, $fail) {
-                        // Cek apakah username dimulai dengan '3511'
-                        if (!preg_match('/^3511/', $value)) {
-                            $fail("Aplikasi ini hanya dapat digunakan oleh warga Bondowoso, harap gunakan guest mode untuk mengakses aplikasi kalkulator gizi, stunting, dan juga informasi terkait stunting.");
-                        }
-                    },
+                    // function ($attribute, $value, $fail) { // sementara di comment karena untuk penguji
+                    //     // Cek apakah username dimulai dengan '3511'
+                    //     if (!preg_match('/^3511/', $value)) {
+                    //         $fail("Aplikasi ini hanya dapat digunakan oleh warga Bondowoso, harap gunakan guest mode untuk mengakses aplikasi kalkulator gizi, stunting, dan juga informasi terkait stunting.");
+                    //     }
+                    // },
                 ],
                 // 'tanggalLahir' => 'required|date',
                 'namaIbu' => 'required|string|max:255',

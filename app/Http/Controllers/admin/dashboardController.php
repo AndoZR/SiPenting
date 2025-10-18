@@ -25,7 +25,21 @@ use Illuminate\Support\Facades\Validator;
 class dashboardController extends Controller
 {
     public function index(){
-        return view("admin.home");
+        // Total seluruh pengguna
+        $jumlahPengguna = User::count();
+
+        // Total user dengan NIK yang diawali '3511'
+        $jumlahPenggunaNik3511 = User::where('nik', 'like', '3511%')->count();
+
+        // Total user dengan NIK bukan '3511'
+        $jumlahPenggunaNon3511 = User::where('nik', 'not like', '3511%')->count();
+
+        // Kirim semua data ke view
+        return view('admin.home', compact(
+            'jumlahPengguna',
+            'jumlahPenggunaNik3511',
+            'jumlahPenggunaNon3511'
+        ));
     }
 
     public function gantiNomorPuskesmas(Request $request){
@@ -390,7 +404,7 @@ class dashboardController extends Controller
             ->join('users', 'bayi.id_users', '=', 'users.id')
             ->join('villages', 'users.id_villages', '=', 'villages.id')
             ->join('districts', 'villages.district_id', '=', 'districts.id')
-            ->where('villages.district_id', $id) // atau '3511170' jika hardcoded
+            ->where('villages.district_id', $id)
             ->select(
                 'hist_gizi.tanggal',
                 'hist_gizi.nilai_gizi',
@@ -419,6 +433,8 @@ class dashboardController extends Controller
                 'data' => $avg,
             ];
         })->values();
+
+        // dd($grouped);
 
         return view("admin.anak.grafikGizi", [
             'labels' => ['Makanan Pokok', 'Minuman', 'Sayuran', 'Buah', 'Lauk Pauk'],

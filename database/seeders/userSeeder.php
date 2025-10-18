@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\berat_badan;
 use Carbon\Carbon;
+use App\Models\berat_badan;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -145,7 +146,7 @@ class userSeeder extends Seeder
             '3511010001','3511010002','3511010003',
             '3511020001','3511020002','3511020003',
             '3511030001','3511030002','3511030004',
-            '3511031002','3511031003','3511031004',
+            // Dihapus: 3511031002, 3511031003, 3511031004
             '3511040001','3511040002','3511040003',
             '3511050001','3511050002','3511050003',
             '3511060001','3511060006','3511060007',
@@ -167,38 +168,200 @@ class userSeeder extends Seeder
             '3511170001','3511170002','3511170003',
         ];
 
-        // Insert user untuk setiap id_village
-        foreach ($villages as $i => $villageId) {
-            DB::table('users')->insert([
-                'nik' => str_pad((3511222222222222 + $i), 16, '0', STR_PAD_LEFT),
-                'username' => str_pad((3511222222222222 + $i), 16, '0', STR_PAD_LEFT),
-                'tanggalLahir' => "1995-01-01",
-                'namaIbu' => "User" . $i,
-                'bbPraHamil' => 50.5,
-                'tinggiBadan' => 160,
-                'role' => 1,
-                'id_villages' => $villageId,
-                'id_subs' => "5a2419c2-03c3-4dac-9060-132986ab3818",
-                'password' => Hash::make(3511222222222222 + $i),
-                'created_at' => $nowDate,
-            ]);
+
+        // // Insert user untuk setiap id_village
+        // foreach ($villages as $i => $villageId) {
+        //     DB::table('users')->insert([
+        //         'nik' => str_pad((3511222222222222 + $i), 16, '0', STR_PAD_LEFT),
+        //         'username' => str_pad((3511222222222222 + $i), 16, '0', STR_PAD_LEFT),
+        //         'tanggalLahir' => "1995-01-01",
+        //         'namaIbu' => "User" . $i,
+        //         'bbPraHamil' => 50.5,
+        //         'tinggiBadan' => 160,
+        //         'role' => 1,
+        //         'id_villages' => $villageId,
+        //         'id_subs' => "5a2419c2-03c3-4dac-9060-132986ab3818",
+        //         'password' => Hash::make(3511222222222222 + $i),
+        //         'created_at' => $nowDate,
+        //     ]);
+        // }
+
+        // // SEEDER UNTUK BERAT BADAN IBU HAMIL HISTORY
+        // $userCount = 72; // total id_users
+        //         $now = Carbon::now();
+
+        //         for ($userId = 1; $userId <= $userCount; $userId++) {
+        //             for ($i = 0; $i < 9; $i++) {
+        //                 $date = $now->copy()->subMonths($i)->startOfMonth();
+
+        //                 berat_badan::create([
+        //                     'bbNow' => rand(8, 20), // nilai berat badan acak antara 8-20 kg
+        //                     'id_users' => $userId,
+        //                     'created_at' => $date,
+        //                     'updated_at' => $date
+        //                 ]);
+        //             }
+        //         }
+
+
+
+
+        //seeding 1000+ user jambesari
+        $faker = Faker::create('id_ID');
+        $faker->addProvider(new \Faker\Provider\id_ID\Person($faker));
+
+        // ====== Bagian Nama ======
+        $namaDepan = [
+            'Siti', 'Nur', 'Hj', 'Lilik', 'Sri', 'Rukayah', 'Rohmah', 'Sulastri', 'Suwarti',
+            'Mulyani', 'Kusmiati', 'Rohani', 'Muniroh', 'Yuliani', 'Hartini', 'Masrifah',
+            'Sumini', 'Sulami', 'Rohimah', 'Minarsih', 'Wahyuni', 'Latifah', 'Masruroh',
+            'Rusmini', 'Marfuah', 'Ainun', 'Zainab', 'Kusnul', 'Rohayati', 'Muslihah',
+            'Wulan', 'Anik', 'Endah', 'Fatimatus', 'Ummi', 'Supiyatun', 'Astutik', 'Maryani',
+            'Tatik', 'Suni', 'Ningsih', 'Sutina', 'Suhai', 'Maryati', 'Muzayanah', 'Sauda',
+            'Eli', 'Sumiyati', 'Astuti', 'Hasanah', 'Sundari', 'Yuli', 'Nurul', 'Samsiah',
+            'Chunaini', 'Cicinur', 'Sunarsih', 'Patima', 'Sukartini', 'Linda', 'Agustina',
+            'Rismiyati', 'Mutik', 'Asiami', 'Husaimah', 'Aliyatin', 'Susyati', 'Astami',
+            'Emi', 'Toyyiba', 'Halimatus', 'Waniah', 'Rusmiati', 'Hairiyah', 'Ani',
+            'Ribka', 'Titin', 'Nurholifah', 'Indah', 'Budiwarti', 'Indra', 'Itna',
+            'Henrita', 'Diah', 'Eva', 'Vindi', 'Elsa', 'Ihwatin', 'Rahmi', 'Wilujeng',
+            'Zayyanah', 'Lutviyah', 'Novita', 'Juhriyah', 'Lela', 'Miga', 'Rahmawati',
+            'Enur', 'Sitti', 'Lutfiah', 'Artiyah', 'Misnati', 'Astika', 'Sumina',
+            'Armiati', 'Yayuk', 'Suwati', 'Suarni', 'Saliha', 'Hatina', 'Sulima',
+            'Rumyati', 'Salima', 'Badriyah', 'Asmuni', 'Sumiati', 'Puryati', 'Asiseh',
+            'Ida', 'Djuma\'ati', 'Roka\'iyah', 'Niti', 'Sumia', 'Faridah', 'Monati',
+            'Legi', 'Ruhannah', 'Hatija', 'Sumrati', 'Rahma', 'Munati', 'Jariyah',
+            'Hozaimah', 'Zainap', 'Hosna', 'Partini', 'Sasmiati', 'Minari', 'Rahmaiya',
+            'Maryam', 'Mani', 'Jumiya', 'Hariyah', 'Mudin', 'Maimunah', 'Asisah',
+            'Asmiani', 'Nurhasanati', 'Mesra', 'Maimuna', 'Juhanah', 'Halila', 'Puji',
+            'Hosniatus', 'Sittiawi', 'Komariyah'
+        ];
+
+        $namaTengah = [
+            'Aini', 'Rahayu', 'Wahyuni', 'Puspita', 'Lestari', 'Rahayuning', 'Masdira', 
+            'Swara', 'Asmudar', 'Rahayu', 'Fatimah', 'Khotimah', 'Puspitasari', 'Rohmah', 
+            'Maryam', 'Latifah', 'Munawaroh', 'Zahro', 'Sari', 'Kusuma', 'Anggraini', 
+            'Hidayah', 'Fauziah', 'Widya', 'Ratna', 'Handayani', 'Susanti', 'Rahmawati'
+        ];
+
+        $namaBelakang = [
+            'Rahayu', 'Sari', 'Wahyuni', 'Lestari', 'Rahmawati', 'Fatimah', 'Handayani', 
+            'Kusuma', 'Zahro', 'Latifah', 'Puspitasari', 'Hidayah', 'Anggraini', 'Masdira',
+            'Rahmah', 'Pertiwi', 'Fitriani', 'Munawaroh', 'Khotimah', 'Susanti', 'Rohmah'
+        ];
+
+        // ====== Village IDs JAMBESARI butuh total 1120 data keseluruhan======
+        $villageJambesari  = [
+            '3511031002',
+            '3511031003',
+            '3511031004',
+            '3511031005',
+            '3511031006',
+            '3511031007',
+            '3511031008',
+            '3511031010'
+        ];
+
+        // id villages butuh 10-30 data setiap desa
+        $villageLain  = [
+            '3511010001','3511010002','3511010003',
+            '3511020001','3511020002','3511020003',
+            '3511030001','3511030002','3511030004',
+            // Dihapus: 3511031002, 3511031003, 3511031004
+            '3511040001','3511040002','3511040003',
+            '3511050001','3511050002','3511050003',
+            '3511060001','3511060006','3511060007',
+            '3511061001','3511061002','3511061003',
+            '3511070001','3511070002','3511070003',
+            '3511080001','3511080002','3511080004',
+            '3511090001','3511090002','3511090003',
+            '3511100001','3511100002','3511100003',
+            '3511110001','3511110002','3511110003',
+            '3511111001','3511111002','3511111003',
+            '3511120001','3511120002','3511120003',
+            '3511130001','3511130002','3511130003',
+            '3511140001','3511140002','3511140003',
+            '3511141001','3511141002','3511141003',
+            '3511150005','3511150006','3511150007',
+            '3511151001','3511151002','3511151003',
+            '3511152001','3511152002','3511152003',
+            '3511160002','3511160003','3511160004',
+            '3511170001','3511170002','3511170003',
+        ];
+
+        $users = [];
+
+        // === Buat user Jambesari (1120 user total) ===
+        foreach ($villageJambesari as $villageId) {
+            $jumlah = rand(130, 150); // tiap desa Jambesari sekitar 130–150 user
+            for ($i = 0; $i < $jumlah; $i++) {
+                $users[] = $this->buatUser($faker, $villageId, $namaDepan, $namaTengah, $namaBelakang);
+            }
         }
 
-        // SEEDER UNTUK BERAT BADAN IBU HAMIL HISTORY
-        $userCount = 72; // total id_users
-                $now = Carbon::now();
+        // === Desa lainnya (10–30 user per desa) ===
+        foreach ($villageLain as $villageId) {
+            $jumlah = rand(10, 30);
+            for ($i = 0; $i < $jumlah; $i++) {
+                $users[] = $this->buatUser($faker, $villageId, $namaDepan, $namaTengah, $namaBelakang);
+            }
+        }
 
-                for ($userId = 1; $userId <= $userCount; $userId++) {
-                    for ($i = 0; $i < 9; $i++) {
-                        $date = $now->copy()->subMonths($i)->startOfMonth();
+        // === Tambahkan 30 user tambahan dengan NIK prefix 3509 ===
+        for ($i = 0; $i < 30; $i++) {
+            $nik = '3509' . str_pad($faker->numberBetween(100000000000, 999999999999), 12, '0', STR_PAD_LEFT);
+            $jumlahKata = $faker->numberBetween(2, 3);
+            $namaIbu = $faker->randomElement($namaDepan);
+            if ($jumlahKata >= 2) $namaIbu .= ' ' . $faker->randomElement($namaTengah);
+            if ($jumlahKata === 3) $namaIbu .= ' ' . $faker->randomElement($namaBelakang);
+            $username = Str::slug(strtolower(str_replace(' ', '', $namaIbu)));
 
-                        berat_badan::create([
-                            'bbNow' => rand(8, 20), // nilai berat badan acak antara 8-20 kg
-                            'id_users' => $userId,
-                            'created_at' => $date,
-                            'updated_at' => $date
-                        ]);
-                    }
-                }
+            $users[] = [
+                'nik' => $nik,
+                'username' => $username,
+                'namaIbu' => $namaIbu,
+                'tanggalLahir' => $faker->dateTimeBetween('-45 years', '-20 years')->format('Y-m-d'),
+                'bbPraHamil' => $faker->randomFloat(1, 40, 80),
+                'tinggiBadan' => $faker->randomFloat(1, 140, 175),
+                'role' => 2,
+                // random dari desa selain Jambesari biar lebih menyebar
+                'id_villages' => $faker->randomElement($villageLain),
+                'password' => Hash::make('password'),
+                'id_subs' => null,
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // === Insert ke database ===
+        foreach (array_chunk($users, 200) as $chunk) {
+            DB::table('users')->insert($chunk);
+        }
+    }
+
+    private function buatUser($faker, $villageId, $namaDepan, $namaTengah, $namaBelakang)
+    {
+        $nik = '3511' . str_pad($faker->unique()->numberBetween(100000000000, 999999999999), 12, '0', STR_PAD_LEFT);
+        $jumlahKata = $faker->numberBetween(2, 3);
+        $namaIbu = $faker->randomElement($namaDepan);
+        if ($jumlahKata >= 2) $namaIbu .= ' ' . $faker->randomElement($namaTengah);
+        if ($jumlahKata === 3) $namaIbu .= ' ' . $faker->randomElement($namaBelakang);
+        $username = Str::slug(strtolower(str_replace(' ', '', $namaIbu)));
+
+        return [
+            'nik' => $nik,
+            'username' => $username,
+            'namaIbu' => $namaIbu,
+            'tanggalLahir' => $faker->dateTimeBetween('-45 years', '-20 years')->format('Y-m-d'),
+            'bbPraHamil' => $faker->randomFloat(1, 40, 80),
+            'tinggiBadan' => $faker->randomFloat(1, 140, 175),
+            'role' => 1,
+            'id_villages' => $villageId,
+            'password' => Hash::make('password'),
+            'id_subs' => null,
+            'remember_token' => Str::random(10),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
     }
 }
