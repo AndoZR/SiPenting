@@ -7,6 +7,7 @@ use App\Http\Controllers\artikelController;
 use App\Http\Controllers\posyanduController;
 use App\Http\Controllers\admin\dashboardController;
 
+
 // route ini untuk membaca file image langsung ke storage tanpa lewat public jadi di view make "{{ url('/storage/artikel') }}/" + fileName;
 Route::get('/storage/artikel/{filename}', function ($filename) {
     $path = storage_path('app/public/artikel/' . $filename);

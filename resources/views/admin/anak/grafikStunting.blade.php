@@ -17,7 +17,7 @@
             </div>
             <div class="card-body">
                 {{-- Radar Chart Canvas --}}
-                <canvas id="lineChartRataStunting" width="1000" height="500"></canvas>
+                <canvas id="barChartRataStunting" width="1000" height="500"></canvas>
             </div>
             <div class="card-footer small text-muted">Terakhir diperbarui: kemarin pukul 23:59</div>
         </div>
@@ -35,115 +35,103 @@
 @push('scripts')
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        // Ambil data dari PHP
-        const labels = @json($labels);
-        const rawDatasets = @json($datasets);
-        const kategoriLabels = ['Sangat Pendek', 'Pendek', 'Normal', 'Tinggi'];
+$(document).ready(function () {
+    const labels = @json($labels);
+    const rawDatasets = @json($datasets);
+    const kategoriLabels = ['Sangat Pendek', 'Pendek', 'Normal', 'Tinggi'];
 
-        // Warna preset supaya beda tiap desa
-        const COLORS = [
-            'rgb(255, 99, 132)',   // merah
-            'rgb(54, 162, 235)',   // biru
-            'rgb(75, 192, 192)',   // hijau
-            'rgb(153, 102, 255)',  // ungu
-            'rgb(255, 159, 64)',   // oranye
-            'rgb(54, 162, 135)',   // teal
-            'rgb(0, 255, 255)',    // cyan
-            'rgb(255, 0, 255)',    // magenta
-            'rgb(165, 42, 42)',    // coklat
-            'rgb(201, 203, 207)'   // abu-abu
-        ];
+    const COLORS = [
+        'rgb(255, 99, 132)',   // merah
+        'rgb(54, 162, 235)',   // biru
+        'rgb(75, 192, 192)',   // hijau
+        'rgb(153, 102, 255)',  // ungu
+        'rgb(255, 159, 64)',   // oranye
+        'rgb(54, 162, 135)',   // teal
+        'rgb(0, 255, 255)',    // cyan
+        'rgb(255, 0, 255)',    // magenta
+        'rgb(165, 42, 42)',    // coklat
+        'rgb(201, 203, 207)'   // abu-abu
+    ];
 
-        // Fungsi buat bikin warna transparan
-        function transparentize(color, opacity = 0.3) {
-            return color.replace('rgb', 'rgba').replace(')', `, ${opacity})`);
-        }
+    function transparentize(color, opacity = 0.6) {
+        return color.replace('rgb', 'rgba').replace(')', `, ${opacity})`);
+    }
 
-        // Siapkan datasets untuk Chart.js
-        const datasets = rawDatasets.map((ds, i) => {
-            const color = COLORS[i % COLORS.length];
-            return {
-                label: ds.label,
-                data: ds.data,
-                borderColor: color,
-                backgroundColor: transparentize(color),
-                fill: false,
-                tension: 0.3,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                spanGaps: true, // agar garis putus-putus tidak muncul saat ada null
-            };
-        });
-
-        const data = {
-            labels: labels,
-            datasets: datasets,
+    const datasets = rawDatasets.map((ds, i) => {
+        const color = COLORS[i % COLORS.length];
+        return {
+            label: ds.label,
+            data: ds.data,
+            backgroundColor: transparentize(color, 0.6),
+            borderColor: color,
+            borderWidth: 1.5,
+            borderRadius: 6,
+            barPercentage: 0.7,
         };
+    });
 
-        const config = {
-            type: 'line',
-            data: data,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Rata-rata Nilai Stunting per Desa per Tanggal'
-                    },
-                    tooltip: {
-                        mode: 'nearest',
-                        intersect: false,
-                        callbacks: {
-                            title: function(context) {
-                                return 'Tanggal: ' + context[0].label;
-                            },
-                            label: function(context) {
-                                const desa = context.dataset.label;
-                                const nilai = context.parsed.y;
-                                const kategoriLabels = ['Sangat Pendek', 'Pendek', 'Normal', 'Tinggi'];
-                                let kategoriText = '';
-                                if (nilai >= 1 && nilai <= 4) {
-                                    kategoriText = kategoriLabels[nilai - 1];
-                                } else {
-                                    kategoriText = '-';
-                                }
-                                return desa + ': ' + nilai + ' (' + kategoriText + ')';
-                            }
-                        }
-                    }
+    const data = { labels, datasets };
+
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                title: {
+                    display: true,
+                    text: 'Rata-rata Nilai Stunting per Desa per Tanggal',
+                    font: { size: 16, weight: 'bold' }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 5,
-                        ticks: {
-                            stepSize: 1,
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return 'Tanggal: ' + context[0].label;
                         },
-                        title: {
-                            display: true,
-                            text: 'Nilai Stunting (1-4)',
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Tanggal',
+                        label: function(context) {
+                            const desa = context.dataset.label;
+                            const nilai = context.raw;
+                            const kategori = kategoriLabels[Math.round(nilai) - 1] ?? '-';
+                            return `${desa}: ${nilai.toFixed(2)} (${kategori})`;
                         }
                     }
                 }
+            },
+            scales: {
+                y: {
+                    min: 1,
+                    max: 4,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            const map = {1: 'Sangat Pendek', 2: 'Pendek', 3: 'Normal', 4: 'Tinggi'};
+                            return map[value] ?? '';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Status Stunting'
+                    },
+                    grid: { color: '#ddd' }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Tanggal'
+                    },
+                    grid: { display: false },
+                    ticks: { autoSkip: false }
+                }
             }
-        };
+        }
+    };
 
-        const ctx = document.getElementById('lineChartRataStunting').getContext('2d');
-        new Chart(ctx, config);
-    });
+    const ctx = document.getElementById('barChartRataStunting').getContext('2d');
+    new Chart(ctx, config);
+});
 </script>
 @endpush

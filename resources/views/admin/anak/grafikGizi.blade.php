@@ -1,6 +1,6 @@
 @extends('admin.app')
-@section('title', 'Grafik Berat Badan')
-@section('sub-title', 'Dashboard / Grafik BB')
+@section('title', 'Grafik Gizi')
+@section('sub-title', 'Dashboard / Grafik Gizi')
 
 @push('css')
 
@@ -35,7 +35,6 @@
 @push('scripts')
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
 $(document).ready(function () {

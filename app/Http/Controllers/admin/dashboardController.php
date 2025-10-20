@@ -327,7 +327,6 @@ class dashboardController extends Controller
         return view("admin.anak.daftarAnak");
     }
 
-
     public function detaildGiziAnak($id, Request $request) {
         try {
             $histori = hist_gizi::where('id_bayi', $id)->orderBy('tanggal', 'asc')->get();
@@ -434,8 +433,6 @@ class dashboardController extends Controller
             ];
         })->values();
 
-        // dd($grouped);
-
         return view("admin.anak.grafikGizi", [
             'labels' => ['Makanan Pokok', 'Minuman', 'Sayuran', 'Buah', 'Lauk Pauk'],
             'datasets' => $grouped
@@ -487,79 +484,161 @@ class dashboardController extends Controller
         return Excel::download(new ExportData($kecamatan_id, 'kecamatan', 'stunting'), 'data-stunting-kecamatan-' . $nama . '.xlsx');
     }
 
-    public function graphStuntingAnak($district_id) {
-        $data = DB::table('hist_stun')
-            ->join('bayi', 'hist_stun.id_bayi', '=', 'bayi.id')
-            ->join('users', 'bayi.id_users', '=', 'users.id')
-            ->join('villages', 'users.id_villages', '=', 'villages.id')
-            ->join('districts', 'villages.district_id', '=', 'districts.id')
-            ->where('villages.district_id', $district_id) // gunakan string jika id bertipe char
-            ->select(
-                'hist_stun.tanggal',
-                'hist_stun.jenis',
-                'hist_stun.id_bayi',
-                'bayi.id_users as user_id',
-                'villages.name as village_name',
-                'districts.name as district_name'
-            )
-            ->orderBy('hist_stun.tanggal')
-            ->get();
+public function graphStuntingAnak($district_id)
+{
+    // Ambil tanggal awal (5 bulan ke belakang dari sekarang)
+    $startDate = Carbon::now()->subMonths(5)->startOfMonth();
+    $endDate = Carbon::now()->endOfMonth();
 
-        // Group data: desa -> tanggal -> [jenis values]
-        $grouped = [];
+    // Ambil data dari database
+    $data = DB::table('hist_stun')
+        ->join('bayi', 'hist_stun.id_bayi', '=', 'bayi.id')
+        ->join('users', 'bayi.id_users', '=', 'users.id')
+        ->join('villages', 'users.id_villages', '=', 'villages.id')
+        ->join('districts', 'villages.district_id', '=', 'districts.id')
+        ->where('villages.district_id', $district_id)
+        ->whereBetween('hist_stun.tanggal', [$startDate, $endDate]) // ✅ hanya ambil 5 bulan terakhir
+        ->select(
+            'hist_stun.tanggal',
+            'hist_stun.jenis',
+            'villages.name as village_name',
+            'districts.name as district_name'
+        )
+        ->orderBy('hist_stun.tanggal')
+        ->get();
 
-        foreach ($data as $item) {
-            $desa = $item->village_name;
-            $tgl = date('d', strtotime($item->tanggal)); // tanggal saja (1-31)
-            $jenis = (int)$item->jenis;
+    // Group data: desa -> bulan -> [jenis values]
+    $grouped = [];
 
-            if (!isset($grouped[$desa])) {
-                $grouped[$desa] = [];
-            }
-            if (!isset($grouped[$desa][$tgl])) {
-                $grouped[$desa][$tgl] = [];
-            }
+    foreach ($data as $item) {
+        $desa = $item->village_name;
+        $bulan = date('Y-m', strtotime($item->tanggal)); // format misal "2025-05"
+        $jenis = (int)$item->jenis;
 
-            $grouped[$desa][$tgl][] = $jenis;
+        if (!isset($grouped[$desa])) {
+            $grouped[$desa] = [];
+        }
+        if (!isset($grouped[$desa][$bulan])) {
+            $grouped[$desa][$bulan] = [];
         }
 
-        // Hitung rata-rata jenis per tanggal per desa
-        $labels = []; // tanggal unik
-        $datasets = [];
-
-        // Kumpulkan semua tanggal unik untuk labels
-        foreach ($grouped as $desa => $tgls) {
-            foreach ($tgls as $tgl => $jenisArr) {
-                if (!in_array($tgl, $labels)) {
-                    $labels[] = $tgl;
-                }
-            }
-        }
-
-        sort($labels, SORT_NUMERIC);
-
-        // Build datasets
-        foreach ($grouped as $desa => $tgls) {
-            $dataPerTanggal = [];
-            foreach ($labels as $tgl) {
-                if (isset($tgls[$tgl])) {
-                    $avg = array_sum($tgls[$tgl]) / count($tgls[$tgl]);
-                    $dataPerTanggal[] = round($avg, 2);
-                } else {
-                    $dataPerTanggal[] = null; // tidak ada data di tanggal itu
-                }
-            }
-            $datasets[] = [
-                'label' => $desa,
-                'data' => $dataPerTanggal
-            ];
-        }
-
-        return view('admin.anak.grafikStunting', [
-            'labels' => $labels,
-            'datasets' => $datasets
-        ]);
+        $grouped[$desa][$bulan][] = $jenis;
     }
+
+    // Ambil semua label bulan unik (misal: 2025-05, 2025-06, dst)
+    $labels = [];
+
+    foreach ($grouped as $desa => $bulanData) {
+        foreach ($bulanData as $bulan => $jenisArr) {
+            if (!in_array($bulan, $labels)) {
+                $labels[] = $bulan;
+            }
+        }
+    }
+
+    sort($labels); // urutkan bulan dari lama ke baru
+
+    // Buat datasets per desa
+    $datasets = [];
+
+    foreach ($grouped as $desa => $bulanData) {
+        $dataPerBulan = [];
+        foreach ($labels as $bulan) {
+            if (isset($bulanData[$bulan])) {
+                $avg = array_sum($bulanData[$bulan]) / count($bulanData[$bulan]);
+                $dataPerBulan[] = round($avg, 2);
+            } else {
+                $dataPerBulan[] = null;
+            }
+        }
+        $datasets[] = [
+            'label' => $desa,
+            'data' => $dataPerBulan
+        ];
+    }
+
+    return view('admin.anak.grafikStunting', [
+        'labels' => $labels,
+        'datasets' => $datasets
+    ]);
+}
+
+
+    // public function graphStuntingAnak($district_id) {
+    //     $data = DB::table('hist_stun')
+    //         ->join('bayi', 'hist_stun.id_bayi', '=', 'bayi.id')
+    //         ->join('users', 'bayi.id_users', '=', 'users.id')
+    //         ->join('villages', 'users.id_villages', '=', 'villages.id')
+    //         ->join('districts', 'villages.district_id', '=', 'districts.id')
+    //         ->where('villages.district_id', $district_id) // gunakan string jika id bertipe char
+    //         ->select(
+    //             'hist_stun.tanggal',
+    //             'hist_stun.jenis',
+    //             'hist_stun.id_bayi',
+    //             'bayi.id_users as user_id',
+    //             'villages.name as village_name',
+    //             'districts.name as district_name'
+    //         )
+    //         ->orderBy('hist_stun.tanggal')
+    //         ->get();
+
+    //     // Group data: desa -> tanggal -> [jenis values]
+    //     $grouped = [];
+
+    //     foreach ($data as $item) {
+    //         $desa = $item->village_name;
+    //         $tgl = date('d', strtotime($item->tanggal)); // tanggal saja (1-31)
+    //         $jenis = (int)$item->jenis;
+
+    //         if (!isset($grouped[$desa])) {
+    //             $grouped[$desa] = [];
+    //         }
+    //         if (!isset($grouped[$desa][$tgl])) {
+    //             $grouped[$desa][$tgl] = [];
+    //         }
+
+    //         $grouped[$desa][$tgl][] = $jenis;
+    //     }
+
+    //     // Hitung rata-rata jenis per tanggal per desa
+    //     $labels = []; // tanggal unik
+    //     $datasets = [];
+
+    //     // Kumpulkan semua tanggal unik untuk labels
+    //     foreach ($grouped as $desa => $tgls) {
+    //         foreach ($tgls as $tgl => $jenisArr) {
+    //             if (!in_array($tgl, $labels)) {
+    //                 $labels[] = $tgl;
+    //             }
+    //         }
+    //     }
+
+    //     sort($labels, SORT_NUMERIC);
+
+    //     // Build datasets
+    //     foreach ($grouped as $desa => $tgls) {
+    //         $dataPerTanggal = [];
+    //         foreach ($labels as $tgl) {
+    //             if (isset($tgls[$tgl])) {
+    //                 $avg = array_sum($tgls[$tgl]) / count($tgls[$tgl]);
+    //                 $dataPerTanggal[] = round($avg, 2);
+    //             } else {
+    //                 $dataPerTanggal[] = null; // tidak ada data di tanggal itu
+    //             }
+    //         }
+    //         $datasets[] = [
+    //             'label' => $desa,
+    //             'data' => $dataPerTanggal
+    //         ];
+    //     }
+
+    //     // dd($datasets);
+
+    //     return view('admin.anak.grafikStunting', [
+    //         'labels' => $labels,
+    //         'datasets' => $datasets
+    //     ]);
+    // }
 
     public function daftarDesaStunting($id, Request $request){
         if($request->ajax()) {
@@ -580,6 +659,4 @@ class dashboardController extends Controller
         $nama = villages::find($village_id)?->name;
         return Excel::download(new ExportData($village_id, 'desa', 'stunting'), 'data-stunting-desa-' . $nama . '.xlsx');
     }
-
-
 }

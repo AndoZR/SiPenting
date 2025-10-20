@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\berat_badan;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
@@ -203,8 +204,31 @@ class userSeeder extends Seeder
         //             }
         //         }
 
+        // Ambil semua user
+        $allUsers = User::all();
 
+        // Hitung jumlah user yang akan diambil (1/8 dari total)
+        $jumlahUser = floor($allUsers->count() / 8);
 
+        // Ambil random user sebanyak 1/8
+        $selectedUsers = $allUsers->random($jumlahUser);
+
+        $data = [];
+
+        foreach ($selectedUsers as $user) {
+            // Berat badan acak (antara 45 - 80 kg misalnya)
+            $bbNow = fake()->randomFloat(1, 45, 60);
+
+            $data[] = [
+                'bbNow' => $bbNow,
+                'id_users' => $user->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Masukkan ke tabel
+        DB::table('berat_badan')->insert($data);
 
         //seeding 1000+ user jambesari
         $faker = Faker::create('id_ID');
